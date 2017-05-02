@@ -67,6 +67,8 @@ var gymTypes = ['Uncontested', 'Mystic', 'Valor', 'Instinct']
 var gymPrestige = [2000, 4000, 8000, 12000, 16000, 20000, 30000, 40000, 50000]
 var audio = new Audio('static/sounds/ding.mp3')
 
+var GenderType = ['♂', '♀', '⚪']
+
 /*
   text place holders:
   <pkm> - pokemon name
@@ -83,7 +85,7 @@ var notifyNoIvTitle = '<pkm>'
   <dist>  - disappear time
   <udist> - time until disappear
 */
-var notifyText = 'disappears at <dist> (<udist>)'
+var notifyText = 'Eltűnik: <dist> (<udist>)'
 
 //
 // Functions
@@ -111,7 +113,8 @@ function removePokemonMarker(encounterId) { // eslint-disable-line no-unused-var
 }
 
 function initMap() { // eslint-disable-line no-unused-vars
-    map = new google.maps.Map(document.getElementById('map'), {
+
+        map = new google.maps.Map(document.getElementById('map'), {
         center: {
             lat: centerLat,
             lng: centerLng
@@ -226,6 +229,7 @@ function initMap() { // eslint-disable-line no-unused-vars
         }
     })
 }
+
 
 function updateLocationMarker(style) {
     if (style in searchMarkerStyles) {
@@ -387,26 +391,54 @@ function getTypeSpan(type) {
 }
 
 function openMapDirections(lat, lng) { // eslint-disable-line no-unused-vars
-    var url = 'https://www.google.com/maps/dir/Current+Location/' + lat + ',' + lng
+    var url = 'https://www.google.com/maps/?daddr=' + lat + ',' + lng
     window.open(url, '_blank')
 }
 
-function pokemonLabel(name, rarity, types, disappearTime, id, latitude, longitude, encounterId, atk, def, sta, move1, move2) {
+// Converts timestamp to readable String
+function getDateStr(t) {
+    var dateStr = 'Unknown'
+    if (t) {
+        var d = new Date(t)
+        dateStr = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
+    }
+    return dateStr
+}
+
+function selectContent(target) { // eslint-disable-line no-unused-vars
+    var selection = window.getSelection()
+    var range = new Range()
+    range.selectNodeContents(target)
+    selection.removeAllRanges()
+    selection.addRange(range)
+}
+
+function pokemonLabel(name, rarity, types, disappearTime, id, latitude, longitude, encounterId, atk, def, sta, move1, move2, weight, height, gender) {
     var disappearDate = new Date(disappearTime)
     var rarityDisplay = rarity ? '(' + rarity + ')' : ''
     var typesDisplay = ''
+    var pMove1 = (moves[move1] !== undefined) ? i8ln(moves[move1]['name']) : 'gen/unknown'
+    var pMove2 = (moves[move2] !== undefined) ? i8ln(moves[move2]['name']) : 'gen/unknown'
+
     $.each(types, function (index, type) {
         typesDisplay += getTypeSpan(type)
     })
     var details = ''
     if (atk != null) {
-        var iv = (atk + def + sta) / 45 * 100
+        var iv = getIv(atk, def, sta)
         details = `
             <div>
                 IV: ${iv.toFixed(1)}% (${atk}/${def}/${sta})
             </div>
             <div>
-                Moves: ${i8ln(moves[move1]['name'])} / ${i8ln(moves[move2]['name'])}
+                Támadások: ${pMove1} / ${pMove2}
+            </div>
+            `
+    }
+    if (gender != null) {
+        details += `
+            <div>
+                Nem: ${GenderType[gender - 1]} | Súly: ${weight.toFixed(2)}kg | Magasság: ${height.toFixed(2)}m
             </div>
             `
     }
@@ -415,30 +447,30 @@ function pokemonLabel(name, rarity, types, disappearTime, id, latitude, longitud
             <b>${name}</b>
             <span> - </span>
             <small>
-                <a href='http://www.pokemon.com/us/pokedex/${id}' target='_blank' title='View in Pokedex'>#${id}</a>
+                <a href='http://www.pokemon.com/us/pokedex/${id}' target='_blank' title='Pokédex Megnyitása'>#${id}</a>
             </small>
             <span> ${rarityDisplay}</span>
             <span> - </span>
             <small>${typesDisplay}</small>
         </div>
         <div>
-            Disappears at ${pad(disappearDate.getHours())}:${pad(disappearDate.getMinutes())}:${pad(disappearDate.getSeconds())}
+            Eltűnik: ${pad(disappearDate.getHours())}:${pad(disappearDate.getMinutes())}:${pad(disappearDate.getSeconds())}
             <span class='label-countdown' disappears-at='${disappearTime}'>(00m00s)</span>
         </div>
         <div>
-            Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+            Hely: <span onclick="selectContent(this)">${latitude.toFixed(6)}, ${longitude.toFixed(7)}</span>
         </div>
             ${details}
         <div>
-            <a href='javascript:excludePokemon(${id})'>Exclude</a>&nbsp;&nbsp
-            <a href='javascript:notifyAboutPokemon(${id})'>Notify</a>&nbsp;&nbsp
-            <a href='javascript:removePokemonMarker("${encounterId}")'>Remove</a>&nbsp;&nbsp
-            <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Get directions</a>
+            <a href='javascript:excludePokemon(${id})'>Kiszűr</a>&nbsp;&nbsp
+            <a href='javascript:notifyAboutPokemon(${id})'>Értesít</a>&nbsp;&nbsp
+            <a href='javascript:removePokemonMarker("${encounterId}")'>Egyet eltűntet</a>&nbsp;&nbsp
+            <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Útvonal</a>
         </div>`
     return contentstring
 }
 
-function gymLabel(teamName, teamId, gymPoints, latitude, longitude, lastScanned = null, name = null, members = [], gymId) {
+function gymLabel(teamName, teamId, gymPoints, latitude, longitude, lastScanned = null, lastModified = null, name = null, members = [], gymId) {
     var memberStr = ''
     for (var i = 0; i < members.length; i++) {
         memberStr += `
@@ -455,10 +487,11 @@ function gymLabel(teamName, teamId, gymPoints, latitude, longitude, lastScanned 
     } else {
         lastScannedStr = 'Unknown'
     }
+    var lastModifiedStr = getDateStr(lastModified)
     var directionsStr = ''
     if (!Store.get('useGymSidebar')) {
         directionsStr = `<div>
-                <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Get directions</a>
+                <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Google Maps Megnyitása'>Get directions</a>
             </div>`
     }
 
@@ -476,10 +509,13 @@ function gymLabel(teamName, teamId, gymPoints, latitude, longitude, lastScanned 
                     </div>
                     ${nameStr}
                     <div>
-                        Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+                        Hely: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
                     </div>
                     <div>
-                        Last Scanned: ${lastScannedStr}
+                        Beszkennelve: ${lastScannedStr}
+                    </div>
+                    <div>
+                        Legutóbb Módosítva: ${lastModifiedStr}
                     </div>
                     ${directionsStr}
                 </center>
@@ -490,26 +526,30 @@ function gymLabel(teamName, teamId, gymPoints, latitude, longitude, lastScanned 
             <div>
                 <center>
                     <div style='padding-bottom: 2px'>
-                        Gym owned by:
+                        Gym Csapata:
                     </div>
                     <div>
-                        <b style='color:rgba(${gymColor[teamId]})'>Team ${teamName}</b><br>
+                        <b style='color:rgba(${gymColor[teamId]})'>${teamName}</b><br>
                         <img height='70px' style='padding: 5px;' src='static/forts/${teamName}_large.png'>
                     </div>
                     <div>
                         ${nameStr}
                     </div>
                     <div>
-                        Level: ${gymLevel} | Prestige: ${gymPoints}/${gymPrestige[gymLevel - 1] || 50000}
+                        Szint: ${gymLevel} | Prestige: ${gymPoints}/${gymPrestige[gymLevel - 1] || 50000}
                     </div>
                     <div>
                         ${memberStr}
                     </div>
                     <div>
-                        Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+                        Hely: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
                     </div>
                     <div>
-                        Last Scanned: ${lastScannedStr}
+                        Beszkennelve: ${lastScannedStr}
+                    </div>
+                    </div>
+                    <div>
+                        Legutóbb Módosítva: ${lastModifiedStr}
                     </div>
                     ${directionsStr}
                 </center>
@@ -535,17 +575,17 @@ function pokestopLabel(expireTime, latitude, longitude) {
 
         str = `
             <div>
-                <b>Lured Pokéstop</b>
+                <b>Lure-ozott Pokéstop</b>
             </div>
             <div>
-                Lure expires at ${pad(expireDate.getHours())}:${pad(expireDate.getMinutes())}:${pad(expireDate.getSeconds())}
+                Lure lejárta: ${pad(expireDate.getHours())}:${pad(expireDate.getMinutes())}:${pad(expireDate.getSeconds())}
                 <span class='label-countdown' disappears-at='${expireTime}'>(00m00s)</span>
             </div>
             <div>
-                Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+                Hely: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
             </div>
             <div>
-                <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Get directions</a>
+                <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Google Maps Megnyitása'>Útvonal</a>
             </div>`
     } else {
         str = `
@@ -553,10 +593,10 @@ function pokestopLabel(expireTime, latitude, longitude) {
                 <b>Pokéstop</b>
             </div>
             <div>
-                Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+                Hely: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
             </div>
             <div>
-                <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Get directions</a>
+                <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Google Maps Megnyitása'>Útvonal</a>
             </div>`
     }
 
@@ -705,7 +745,7 @@ function customizePokemonMarker(marker, item, skipNotification) {
     }
 
     marker.infoWindow = new google.maps.InfoWindow({
-        content: pokemonLabel(item['pokemon_name'], item['pokemon_rarity'], item['pokemon_types'], item['disappear_time'], item['pokemon_id'], item['latitude'], item['longitude'], item['encounter_id'], item['individual_attack'], item['individual_defense'], item['individual_stamina'], item['move_1'], item['move_2']),
+        content: pokemonLabel(item['pokemon_name'], item['pokemon_rarity'], item['pokemon_types'], item['disappear_time'], item['pokemon_id'], item['latitude'], item['longitude'], item['encounter_id'], item['individual_attack'], item['individual_defense'], item['individual_stamina'], item['move_1'], item['move_2'], item['weight'], item['height'], item['gender']),
         disableAutoPan: true
     })
 
@@ -757,7 +797,7 @@ function setupGymMarker(item) {
     }
 
     marker.infoWindow = new google.maps.InfoWindow({
-        content: gymLabel(gymTypes[item['team_id']], item['team_id'], item['gym_points'], item['latitude'], item['longitude'], item['last_scanned'], item['name'], item['pokemon'], item['gym_id']),
+        content: gymLabel(gymTypes[item['team_id']], item['team_id'], item['gym_points'], item['latitude'], item['longitude'], item['last_scanned'], item['last_modified'], item['name'], item['pokemon'], item['gym_id']),
         disableAutoPan: true
     })
 
@@ -800,7 +840,7 @@ function updateGymMarker(item, marker) {
         url: 'static/forts/' + Store.get('gymMarkerStyle') + '/' + gymTypes[item['team_id']] + (item['team_id'] !== 0 ? '_' + getGymLevel(item['gym_points']) : '') + '.png',
         scaledSize: new google.maps.Size(48, 48)
     })
-    marker.infoWindow.setContent(gymLabel(gymTypes[item['team_id']], item['team_id'], item['gym_points'], item['latitude'], item['longitude'], item['last_scanned'], item['name'], item['pokemon'], item['gym_id']))
+    marker.infoWindow.setContent(gymLabel(gymTypes[item['team_id']], item['team_id'], item['gym_points'], item['latitude'], item['longitude'], item['last_scanned'], item['last_modified'], item['name'], item['pokemon'], item['gym_id']))
     return marker
 }
 
@@ -1075,75 +1115,142 @@ function showInBoundsMarkers(markers, type) {
         }
     })
 }
+function checkToken() {
 
+	
+	console.log('check token')
+    var id_token = localStorage.getItem('id_token');
+	if (id_token) {
+		
+		var lock = new Auth0Lock('7IGpKBmL9sMljdFRUx2TNsNveNMFzbyX', 'pokemonbudapestvip.auth0.com');
+		var btn_login = document.getElementById('btn-login');
+		var btn_logout = document.getElementById('btn-logout');
+		lock.getProfile(id_token, function (err, profile) {
+			if (err) {			
+			  console.log('remove token');
+				localStorage.removeItem('id_token');
+				btn_login.style.display = "inline";
+				btn_logout.style.display = "none";
+				document.getElementById('info-msg').innerHTML = '';
+			  return alert('There was an error getting the profile: ' + err.message);	
+			}
+			
+			var expiration = new Date(profile.app_metadata.expiration);
+			var year = expiration.getFullYear();
+			var month = expiration.getMonth()+1;
+			var day = expiration.getDate();
+			var hours = '0' + expiration.getHours();
+			var minutes = '0' + expiration.getMinutes();
+			var date = new Date();
+					
+			if (expiration >= date) {
+				console.log('valid token')
+
+				if (profile.roles.indexOf('trial') != -1) {
+					document.getElementById('info-msg').innerHTML = 'Próbaidőszak ' + year + '.' + month + '.' + day + ' - ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2) + '-ig'
+					} else {
+					document.getElementById('info-msg').innerHTML = 'Előfizetés ' + year + '.' + month + '.' + day + ' - ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2) + '-ig'
+					}
+				
+				
+				btn_login.style.display = "none";
+				btn_logout.style.display = "inline";	
+
+			} else {
+				if (!$timeoutDialog) {
+					var opts = {
+						title: 'Merre vannak a pokemonok?'
+					}
+
+					$timeoutDialog = $('<div>Keresd a /pokemonbudapest facebook csoportot, a további térképhasználatért!</div>').dialog(opts)
+					$timeoutDialog.dialog('open')
+				} else if (!$timeoutDialog.dialog('isOpen')) {
+					$timeoutDialog.dialog('open')
+				}
+				console.log('remove token')
+				localStorage.removeItem('id_token');
+				btn_login.style.display = "inline";
+				btn_logout.style.display = "none";
+				if (profile.roles.indexOf('trial') != -1) {
+					document.getElementById('info-msg').innerHTML = 'Lejárt a próbaidőszak!'
+					} else {
+					document.getElementById('info-msg').innerHTML = 'Lejárt az előfizetés ' + year + '.' + month + '.' + day + ' - ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2) + '-kor'
+					}
+			}
+		});
+	}
+}
 function loadRawData() {
-    var loadPokemon = Store.get('showPokemon')
-    var loadGyms = Store.get('showGyms')
-    var loadPokestops = Store.get('showPokestops')
-    var loadScanned = Store.get('showScanned')
-    var loadSpawnpoints = Store.get('showSpawnpoints')
-    var loadLuredOnly = Boolean(Store.get('showLuredPokestopsOnly'))
+    var id_token = localStorage.getItem('id_token');
+	if (id_token) {
+	var loadPokemon = Store.get('showPokemon')
+	var loadGyms = Store.get('showGyms')
+	var loadPokestops = Store.get('showPokestops')
+	var loadScanned = Store.get('showScanned')
+	var loadSpawnpoints = Store.get('showSpawnpoints')
+	var loadLuredOnly = Boolean(Store.get('showLuredPokestopsOnly'))
 
-    var bounds = map.getBounds()
-    var swPoint = bounds.getSouthWest()
-    var nePoint = bounds.getNorthEast()
-    var swLat = swPoint.lat()
-    var swLng = swPoint.lng()
-    var neLat = nePoint.lat()
-    var neLng = nePoint.lng()
+	var bounds = map.getBounds()
+	var swPoint = bounds.getSouthWest()
+	var nePoint = bounds.getNorthEast()
+	var swLat = swPoint.lat()
+	var swLng = swPoint.lng()
+	var neLat = nePoint.lat()
+	var neLng = nePoint.lng()
 
-    return $.ajax({
-        url: 'raw_data',
-        type: 'GET',
-        data: {
-            'timestamp': timestamp,
-            'pokemon': loadPokemon,
-            'lastpokemon': lastpokemon,
-            'pokestops': loadPokestops,
-            'lastpokestops': lastpokestops,
-            'luredonly': loadLuredOnly,
-            'gyms': loadGyms,
-            'lastgyms': lastgyms,
-            'scanned': loadScanned,
-            'lastslocs': lastslocs,
-            'spawnpoints': loadSpawnpoints,
-            'lastspawns': lastspawns,
-            'swLat': swLat,
-            'swLng': swLng,
-            'neLat': neLat,
-            'neLng': neLng,
-            'oSwLat': oSwLat,
-            'oSwLng': oSwLng,
-            'oNeLat': oNeLat,
-            'oNeLng': oNeLng,
-            'reids': String(reincludedPokemon),
-            'eids': String(excludedPokemon)
-        },
-        dataType: 'json',
-        cache: false,
-        beforeSend: function () {
-            if (rawDataIsLoading) {
-                return false
-            } else {
-                rawDataIsLoading = true
-            }
-        },
-        error: function () {
-            if (!$timeoutDialog) {
-                var opts = {
-                    title: 'Reduce marker settings'
-                }
+	return $.ajax({
+		url: 'raw_data',
+		type: 'GET',
+		data: {
+			'timestamp': timestamp,
+			'pokemon': loadPokemon,
+			'lastpokemon': lastpokemon,
+			'pokestops': loadPokestops,
+			'lastpokestops': lastpokestops,
+			'luredonly': loadLuredOnly,
+			'gyms': loadGyms,
+			'lastgyms': lastgyms,
+			'scanned': loadScanned,
+			'lastslocs': lastslocs,
+			'spawnpoints': loadSpawnpoints,
+			'lastspawns': lastspawns,
+			'swLat': swLat,
+			'swLng': swLng,
+			'neLat': neLat,
+			'neLng': neLng,
+			'oSwLat': oSwLat,
+			'oSwLng': oSwLng,
+			'oNeLat': oNeLat,
+			'oNeLng': oNeLng,
+			'reids': String(reincludedPokemon),
+			'eids': String(excludedPokemon)
+		},
+		dataType: 'json',
+		cache: false,
+		beforeSend: function () {
+			if (rawDataIsLoading) {
+				return false
+			} else {
+				rawDataIsLoading = true
+			}
+		},
+		error: function () {
+			if (!$timeoutDialog) {
+				var opts = {
+					title: 'Szűkítsd a beállításokat!'
+				}
 
-                $timeoutDialog = $('<div>Hmm... we\'re having problems getting data for your criteria. Try reducing what you\'re showing and zooming in to limit what\'s returned.</div>').dialog(opts)
-                $timeoutDialog.dialog('open')
-            } else if (!$timeoutDialog.dialog('isOpen')) {
-                $timeoutDialog.dialog('open')
-            }
-        },
-        complete: function () {
-            rawDataIsLoading = false
-        }
-    })
+				$timeoutDialog = $('<div>Hmm... a beállításaid szerinti adatok lekérdezése közben problémákba ütköztünk. Próbáld meg csökkenteni, hogy mit szeretnél látni, vagy közelíts rá jobban a térképre!</div>').dialog(opts)
+				$timeoutDialog.dialog('open')
+			} else if (!$timeoutDialog.dialog('isOpen')) {
+				$timeoutDialog.dialog('open')
+			}
+		},
+		complete: function () {
+			rawDataIsLoading = false
+		}
+	})
+	}
 }
 
 function processPokemons(i, item) {
@@ -1709,25 +1816,26 @@ function showGymDetails(id) { // eslint-disable-line no-unused-vars
         var nextLvlPrestige = gymPrestige[gymLevel - 1] || 50000
         var prestigePercentage = (result.gym_points / nextLvlPrestige) * 100
         var lastScannedDate = new Date(result.last_scanned)
+        var lastModifiedDateStr = getDateStr(result.last_modified)
         var freeSlots = result.pokemon.length ? gymLevel - result.pokemon.length : 0
-        var freeSlotsStr = freeSlots ? ` - ${freeSlots} Free Slots` : ''
+        var freeSlotsStr = freeSlots ? ` - ${freeSlots} Szabad Hely` : ''
         var gymLevelStr = ''
 
         if (result.team_id === 0) {
             gymLevelStr = `
-                <center class="team-${result.team_id}-text">
-                    <b class="team-${result.team_id}-text">Uncontested - 1 Free Slot</b>
+                <center>
+                    <b>Üres - 1 Szabad Hely</b>
                 </center>`
         } else {
             gymLevelStr = `<div>
-                <b class="team-${result.team_id}-text">Level ${gymLevel}${freeSlotsStr}</b>
+                <b>Level ${gymLevel}${freeSlotsStr}</b>
             </div>`
         }
         var pokemonHtml = ''
         var headerHtml = `
-            <center class="team-${result.team_id}-text">
+            <center>
                 <div>
-                    <b class="team-${result.team_id}-text">${result.name || ''}</b>
+                    <b>${result.name || ''}</b>
                 </div>
                 <img height="100px" style="padding: 5px;" src="static/forts/${gymTypes[result.team_id]}_large.png">
                 <div class="prestige-bar team-${result.team_id}">
@@ -1739,10 +1847,13 @@ function showGymDetails(id) { // eslint-disable-line no-unused-vars
                 </div>
                 ${gymLevelStr}
                 <div style="font-size: .7em;">
-                    Last Scanned: ${lastScannedDate.getFullYear()}-${pad(lastScannedDate.getMonth() + 1)}-${pad(lastScannedDate.getDate())} ${pad(lastScannedDate.getHours())}:${pad(lastScannedDate.getMinutes())}:${pad(lastScannedDate.getSeconds())}
+                    Beszkennelve: ${lastScannedDate.getFullYear()}-${pad(lastScannedDate.getMonth() + 1)}-${pad(lastScannedDate.getDate())} ${pad(lastScannedDate.getHours())}:${pad(lastScannedDate.getMinutes())}:${pad(lastScannedDate.getSeconds())}
+                </div>
+                <div style="font-size: .7em;">
+                    Legutóbb Módosítva: ${lastModifiedDateStr}
                 </div>
                 <div>
-                    <a href='javascript:void(0);' onclick='javascript:openMapDirections(${result.latitude},${result.longitude});' title='View in Maps'>Get directions</a>
+                    <a href='javascript:void(0);' onclick='javascript:openMapDirections(${result.latitude},${result.longitude});' title='Google Maps Megnyitása'>Útvonal</a>
                 </div>
             </center>
         `
@@ -1757,17 +1868,17 @@ function showGymDetails(id) { // eslint-disable-line no-unused-vars
                         <td width="30px">
                             <i class="pokemon-sprite n${pokemon.pokemon_id}"></i>
                         </td>
-                        <td class="team-${result.team_id}-text">
+                        <td>
                             <div style="line-height:1em;">${pokemon.pokemon_name}</div>
                             <div class="cp">CP ${pokemon.pokemon_cp}</div>
                         </td>
-                        <td width="190" class="team-${result.team_id}-text" align="center">
+                        <td width="190" align="center">
                             <div class="trainer-level">${pokemon.trainer_level}</div>
                             <div style="line-height: 1em;">${pokemon.trainer_name}</div>
                         </td>
                         <td width="10">
                             <!--<a href="#" onclick="toggleGymPokemonDetails(this)">-->
-                                <i class="team-${result.team_id}-text fa fa-angle-double-down"></i>
+                                <i class="fa fa-angle-double-down"></i>
                             <!--</a>-->
                         </td>
                     </tr>
@@ -1805,7 +1916,7 @@ function showGymDetails(id) { // eslint-disable-line no-unused-vars
                                 <div class="move">
                                     <div class="name">
                                         ${pokemon.move_1_name}
-                                        <div class="type ${pokemon.move_1_type.toLowerCase()}">${pokemon.move_1_type}</div>
+                                        <div class="type ${pokemon.move_1_type['type_en'].toLowerCase()}">${pokemon.move_1_type['type']}</div>
                                     </div>
                                     <div class="damage">
                                         ${pokemon.move_1_damage}
@@ -1815,7 +1926,7 @@ function showGymDetails(id) { // eslint-disable-line no-unused-vars
                                 <div class="move">
                                     <div class="name">
                                         ${pokemon.move_2_name}
-                                        <div class="type ${pokemon.move_2_type.toLowerCase()}">${pokemon.move_2_type}</div>
+                                        <div class="type ${pokemon.move_2_type['type_en'].toLowerCase()}">${pokemon.move_2_type['type']}</div>
                                         <div>
                                             <i class="move-bar-sprite move-bar-sprite-${moveEnergy}"></i>
                                         </div>
@@ -1835,10 +1946,10 @@ function showGymDetails(id) { // eslint-disable-line no-unused-vars
             pokemonHtml = ''
         } else {
             pokemonHtml = `
-                <center class="team-${result.team_id}-text">
+                <center>
                     Gym Leader:<br>
                     <i class="pokemon-large-sprite n${result.guard_pokemon_id}"></i><br>
-                    <b class="team-${result.team_id}-text">${result.guard_pokemon_name}</b>
+                    <b>${result.guard_pokemon_name}</b>
 
                     <p style="font-size: .75em; margin: 5px;">
                         No additional gym information is available for this gym. Make sure you are collecting <a href="https://pgm.readthedocs.io/en/develop/extras/gyminfo.html">detailed gym info.</a>
@@ -2109,7 +2220,7 @@ $(function () {
     $selectPokemonNotify = $('#notify-pokemon')
     $selectRarityNotify = $('#notify-rarity')
     $textPerfectionNotify = $('#notify-perfection')
-    var numberOfPokemon = 151
+    var numberOfPokemon = 493
 
     // Load pokemon names and populate lists
     $.getJSON('static/dist/data/pokemon.min.json').done(function (data) {
@@ -2138,17 +2249,17 @@ $(function () {
 
         // setup the filter lists
         $selectExclude.select2({
-            placeholder: i8ln('Select Pokémon'),
+            placeholder: i8ln('Válassz Pokémont'),
             data: pokeList,
             templateResult: formatState
         })
         $selectPokemonNotify.select2({
-            placeholder: i8ln('Select Pokémon'),
+            placeholder: i8ln('Válassz Pokémont'),
             data: pokeList,
             templateResult: formatState
         })
         $selectRarityNotify.select2({
-            placeholder: i8ln('Select Rarity'),
+            placeholder: i8ln('Válassz Ritkaságot'),
             data: [i8ln('Common'), i8ln('Uncommon'), i8ln('Rare'), i8ln('Very Rare'), i8ln('Ultra Rare')],
             templateResult: formatState
         })
@@ -2199,6 +2310,7 @@ $(function () {
     window.setInterval(updateLabelDiffTime, 1000)
     window.setInterval(updateMap, 5000)
     window.setInterval(updateGeoLocation, 1000)
+	window.setInterval(checkToken, 10000)
 
     createUpdateWorker()
 

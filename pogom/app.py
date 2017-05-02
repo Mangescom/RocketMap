@@ -55,7 +55,7 @@ class Pogom(Flask):
         self.route("/search_control", methods=['GET'])(self.get_search_control)
         self.route("/search_control", methods=['POST'])(
             self.post_search_control)
-        self.route("/stats", methods=['GET'])(self.get_stats)
+        self.route("/foltinstats", methods=['GET'])(self.get_stats)
         self.route("/status", methods=['GET'])(self.get_status)
         self.route("/status", methods=['POST'])(self.post_status)
         self.route("/gym_data", methods=['GET'])(self.get_gymdata)
@@ -63,6 +63,10 @@ class Pogom(Flask):
         self.route("/inject.js", methods=['GET'])(self.render_inject_js)
         self.route("/submit_token", methods=['POST'])(self.submit_token)
         self.route("/get_stats", methods=['GET'])(self.get_account_stats)
+        self.route("/robots.txt", methods=['GET'])(self.render_robots_txt)
+
+    def render_robots_txt(self):
+        return render_template('robots.txt')
 
     def get_bookmarklet(self):
         return render_template('bookmarklet.html')

@@ -13,6 +13,7 @@ import random
 import time
 import socket
 import struct
+import zipfile
 import requests
 from uuid import uuid4
 from s2sphere import CellId, LatLng
@@ -106,10 +107,10 @@ def get_args():
     parser.add_argument('-altv', '--altitude-variance',
                         help='Variance for --altitude in meters',
                         type=int, default=1)
-    parser.add_argument('-nac', '--no-altitude-cache',
-                        help=('Do not cache fetched altitudes in the' +
-                              'database. This implies fetching the altitude ' +
-                              'only once for the running instance.'),
+    parser.add_argument('-uac', '--use-altitude-cache',
+                        help=('Query the Elevation API for each step,' +
+                              ' rather than only once, and store results in' +
+                              ' the database.'),
                         action='store_true', default=False)
     parser.add_argument('-nj', '--no-jitter',
                         help=("Don't apply random -9m to +9m jitter to " +
@@ -273,6 +274,10 @@ def get_args():
                         help=('Set a maximum speed in km/hour for scanner ' +
                               'movement.'),
                         type=int, default=35)
+    parser.add_argument('-ldur', '--lure-duration',
+                        help=('Change duration for lures set on pokestops. ' +
+                              'This is useful for events that extend lure ' +
+                              'duration.'), type=int, default=30)
     parser.add_argument('--dump-spawnpoints',
                         help=('Dump the spawnpoints from the db to json ' +
                               '(only for use with -ss).'),
@@ -359,6 +364,24 @@ def get_args():
                         help=('Send webhook updates with scheduler status ' +
                               '(use with -wh).'),
                         action='store_true', default=True)
+    webhook_list = parser.add_mutually_exclusive_group()
+    webhook_list.add_argument('-wwht', '--webhook-whitelist',
+                              action='append', default=[],
+                              help=('List of Pokemon to send to '
+                                    ' webhooks.'))
+    webhook_list.add_argument('-wblk', '--webhook-blacklist',
+                              action='append', default=[],
+                              help=('List of Pokemon to NOT send to'
+                                    ' webhooks.'))
+
+    webhook_list.add_argument('-wwhtf', '--webhook-whitelist-file',
+                              default='', help='File containing a list of '
+                                               'Pokemon to send to'
+                                               ' webhooks.')
+    webhook_list.add_argument('-wblkf', '--webhook-blacklist-file',
+                              default='', help='File containing a list of '
+                                               'Pokemon to NOT send to'
+                                               ' webhooks.')
     parser.add_argument('--ssl-certificate',
                         help='Path to SSL certificate file.')
     parser.add_argument('--ssl-privatekey',
@@ -391,6 +414,20 @@ def get_args():
                         help=('Pause searching while web UI is inactive ' +
                               'for this timeout(in seconds).'),
                         type=int, default=0)
+    parser.add_argument('-clss', '--sscluster',
+                        help='Cluster spawnpoints before use (with -ss and no .json)', action='store_true', default=False)
+    parser.add_argument('-tth', '--timetreshold', help='Time treshold of clustering',
+                        type=float, default=300)
+    parser.add_argument('-sl', '--speed_limit',
+                        help='Maximum speed between jumps in KM/hr, default 32 kph',
+                        type=float, default=32)
+    parser.add_argument('-novc', '--no-version-check', action='store_true',
+                        help='Disable API version check.',
+                        default=False)
+    parser.add_argument('-vci', '--version-check-interval', type=int,
+                        help='Interval to check API version in seconds ' +
+                        '(Default: in [60, 300]).',
+                        default=random.randint(60, 300))
     parser.add_argument('--disable-blacklist',
                         help=('Disable the global anti-scraper IP blacklist.'),
                         action='store_true', default=False)
@@ -627,6 +664,19 @@ def get_args():
                                         args.encounter_blacklist]
             args.encounter_whitelist = [int(i) for i in
                                         args.encounter_whitelist]
+        if args.webhook_whitelist_file:
+            with open(args.webhook_whitelist_file) as f:
+                args.webhook_whitelist = [get_pokemon_id(name) for name in
+                                          f.read().splitlines()]
+        elif args.webhook_blacklist_file:
+            with open(args.webhook_blacklist_file) as f:
+                args.webhook_blacklist = [get_pokemon_id(name) for name in
+                                          f.read().splitlines()]
+        else:
+            args.webhook_blacklist = [int(i) for i in
+                                      args.webhook_blacklist]
+            args.webhook_whitelist = [int(i) for i in
+                                      args.webhook_whitelist]
 
         # Decide which scanning mode to use.
         if args.spawnpoint_scanning:
@@ -781,7 +831,8 @@ def get_move_energy(move_id):
 
 
 def get_move_type(move_id):
-    return i8ln(get_moves_data(move_id)['type'])
+    move_type = get_moves_data(move_id)['type']
+    return {"type": i8ln(move_type), "type_en": move_type}
 
 
 class Timer():
@@ -862,3 +913,10 @@ def generate_device_info():
         device_info['firmware_type'] = random.choice(ios8 + ios9 + ios10)
 
     return device_info
+
+
+def extract_sprites():
+    log.debug("Extracting sprites...")
+    zip = zipfile.ZipFile('static01.zip', 'r')
+    zip.extractall('static')
+    zip.close()
