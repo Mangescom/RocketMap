@@ -29,6 +29,7 @@ import requests
 import schedulers
 import terminalsize
 
+
 from datetime import datetime
 from threading import Thread, Lock
 from queue import Queue, Empty
@@ -47,6 +48,8 @@ from .transform import get_new_coords, jitter_location
 from .account import (setup_api, check_login, get_tutorial_state,
                       complete_tutorial, AccountSet)
 from .captcha import captcha_overseer_thread, handle_captcha
+from geopy.distance import vincenty
+
 from .proxy import get_new_proxy
 
 log = logging.getLogger(__name__)
@@ -739,7 +742,7 @@ def generate_hive_locations(current_location, step_distance,
 def search_worker_thread(args, account_queue, account_sets, account_failures,
                          account_captchas, search_items_queue, pause_bit,
                          status, dbq, whq, scheduler, key_scheduler):
-
+    step_location = []
     log.debug('Search worker thread starting...')
 
     # The outer forever loop restarts only when the inner one is
@@ -779,6 +782,7 @@ def search_worker_thread(args, account_queue, account_sets, account_failures,
             status['noitems'] = 0
             status['skip'] = 0
             status['captcha'] = 0
+            firstrun = True
 
             stagger_thread(args)
 
@@ -867,6 +871,16 @@ def search_worker_thread(args, account_queue, account_sets, account_failures,
                 # The next_item will return the value telling us how long
                 # to sleep. This way the status can be updated
                 time.sleep(wait)
+
+                # Speedlimit
+                if not firstrun and args.spawnpoint_scanning:  # no need to check distance upon login
+                    randomizer = random.uniform(0.95, 1)
+                    sdelay = vincenty(step_location, next_location).meters / ((args.speed_limit / 3.6) * randomizer)  # Classic basic physics formula: time = distance divided by velocity (in km/hr), plus a little randomness between 70 and 100% speed.
+                    status['message'] += ', sleeping {}s until {}'.format(max(sdelay, args.scan_delay), time.strftime('%H:%M:%S', time.localtime(time.time() + max(sdelay, args.scan_delay))))
+                    time.sleep(max(sdelay, args.scan_delay))  # lets sleep here for at least the scan delay time, or to keep us under the speed limiter, whichever is greatest.
+
+
+                step_location = next_location
 
                 # Using step as a flag for no valid next location returned.
                 if step == -1:
@@ -1119,6 +1133,7 @@ def search_worker_thread(args, account_queue, account_sets, account_failures,
                         time.localtime(time.time() + args.scan_delay)))
                 log.info(status['message'])
                 time.sleep(delay)
+                firstrun = False
 
         # Catch any process exceptions, log them, and continue the thread.
         except Exception as e:
@@ -1267,6 +1282,7 @@ def get_api_version(args):
             'https://pgorelease.nianticlabs.com/plfe/version',
             proxies=proxies,
             verify=False)
+
         return r.text[2:] if (r.status_code == requests.codes.ok and
                               r.text[2:].count('.') == 2) else 0
     except Exception as e:

@@ -70,6 +70,7 @@ var genderType = ['♂', '♀', '⚲']
 var unownForm = ['unset', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '!', '?']
 
 
+
 /*
   text place holders:
   <pkm> - pokemon name
@@ -86,7 +87,7 @@ var notifyNoIvTitle = '<pkm>'
   <dist>  - disappear time
   <udist> - time until disappear
 */
-var notifyText = 'disappears at <dist> (<udist>)'
+var notifyText = 'Eltűnik: <dist> (<udist>)'
 
 //
 // Functions
@@ -114,7 +115,8 @@ function removePokemonMarker(encounterId) { // eslint-disable-line no-unused-var
 }
 
 function initMap() { // eslint-disable-line no-unused-vars
-    map = new google.maps.Map(document.getElementById('map'), {
+
+        map = new google.maps.Map(document.getElementById('map'), {
         center: {
             lat: centerLat,
             lng: centerLng
@@ -229,6 +231,7 @@ function initMap() { // eslint-disable-line no-unused-vars
         }
     })
 }
+
 
 function updateLocationMarker(style) {
     if (style in searchMarkerStyles) {
@@ -399,6 +402,7 @@ function getDateStr(t) {
     var dateStr = 'Unknown'
     if (t) {
         dateStr = moment(t).format('YYYY-MM-DD HH:mm:ss')
+
     }
     return dateStr
 }
@@ -425,12 +429,14 @@ function pokemonLabel(item) {
     var form = item['form']
     var cp = item['cp']
 
+
     $.each(types, function (index, type) {
         typesDisplay += getTypeSpan(type)
     })
 
     var details = ''
     if (atk !== null && def !== null && sta !== null) {
+
         var iv = getIv(atk, def, sta)
         details = `
             <div>
@@ -448,14 +454,16 @@ function pokemonLabel(item) {
 
         details += `
             <div>
-                Moves: ${pMove1} / ${pMove2}
+                Támadások: ${pMove1} / ${pMove2}
             </div>
             `
     }
     if (gender !== null && weight !== null && height !== null) {
         details += `
             <div>
-                Gender: ${genderType[gender - 1]} | Weight: ${weight.toFixed(2)}kg | Height: ${height.toFixed(2)}m
+
+                Nem: ${genderType[gender - 1]} | Súly: ${weight.toFixed(2)}kg | Magasság: ${height.toFixed(2)}m
+
             </div>
             `
     }
@@ -467,25 +475,25 @@ function pokemonLabel(item) {
     }
     contentstring += `<span> - </span>
             <small>
-                <a href='http://www.pokemon.com/us/pokedex/${id}' target='_blank' title='View in Pokedex'>#${id}</a>
+                <a href='http://www.pokemon.com/us/pokedex/${id}' target='_blank' title='Pokédex Megnyitása'>#${id}</a>
             </small>
             <span> ${rarityDisplay}</span>
             <span> - </span>
             <small>${typesDisplay}</small>
         </div>
         <div>
-            Disappears at ${pad(disappearDate.getHours())}:${pad(disappearDate.getMinutes())}:${pad(disappearDate.getSeconds())}
+            Eltűnik: ${pad(disappearDate.getHours())}:${pad(disappearDate.getMinutes())}:${pad(disappearDate.getSeconds())}
             <span class='label-countdown' disappears-at='${disappearTime}'>(00m00s)</span>
         </div>
         <div>
-            Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+            Hely: <span onclick="selectContent(this)">${latitude.toFixed(6)}, ${longitude.toFixed(7)}</span>
         </div>
             ${details}
         <div>
-            <a href='javascript:excludePokemon(${id})'>Exclude</a>&nbsp;&nbsp
-            <a href='javascript:notifyAboutPokemon(${id})'>Notify</a>&nbsp;&nbsp
-            <a href='javascript:removePokemonMarker("${encounterId}")'>Remove</a>&nbsp;&nbsp
-            <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Get directions</a>
+            <a href='javascript:excludePokemon(${id})'>Kiszűr</a>&nbsp;&nbsp
+            <a href='javascript:notifyAboutPokemon(${id})'>Értesít</a>&nbsp;&nbsp
+            <a href='javascript:removePokemonMarker("${encounterId}")'>Egyet eltűntet</a>&nbsp;&nbsp
+            <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Útvonal</a>
         </div>`
     return contentstring
 }
@@ -500,12 +508,14 @@ function gymLabel(teamName, teamId, gymPoints, latitude, longitude, lastScanned 
             </span>`
     }
 
+
     var lastScannedStr = getDateStr(lastScanned)
+
     var lastModifiedStr = getDateStr(lastModified)
     var directionsStr = ''
     if (!Store.get('useGymSidebar')) {
         directionsStr = `<div>
-                <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Get directions</a>
+                <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Google Maps Megnyitása'>Get directions</a>
             </div>`
     }
 
@@ -523,10 +533,13 @@ function gymLabel(teamName, teamId, gymPoints, latitude, longitude, lastScanned 
                     </div>
                     ${nameStr}
                     <div>
-                        Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+                        Hely: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
                     </div>
                     <div>
-                        Last Scanned: ${lastScannedStr}
+                        Beszkennelve: ${lastScannedStr}
+                    </div>
+                    <div>
+                        Legutóbb Módosítva: ${lastModifiedStr}
                     </div>
                     <div>
                         Last Modified: ${lastModifiedStr}
@@ -540,26 +553,30 @@ function gymLabel(teamName, teamId, gymPoints, latitude, longitude, lastScanned 
             <div>
                 <center>
                     <div style='padding-bottom: 2px'>
-                        Gym owned by:
+                        Gym Csapata:
                     </div>
                     <div>
-                        <b style='color:rgba(${gymColor[teamId]})'>Team ${teamName}</b><br>
+                        <b style='color:rgba(${gymColor[teamId]})'>${teamName}</b><br>
                         <img height='70px' style='padding: 5px;' src='static/forts/${teamName}_large.png'>
                     </div>
                     <div>
                         ${nameStr}
                     </div>
                     <div>
-                        Level: ${gymLevel} | Prestige: ${gymPoints}/${gymPrestige[gymLevel - 1] || 50000}
+                        Szint: ${gymLevel} | Prestige: ${gymPoints}/${gymPrestige[gymLevel - 1] || 50000}
                     </div>
                     <div>
                         ${memberStr}
                     </div>
                     <div>
-                        Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+                        Hely: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
                     </div>
                     <div>
-                        Last Scanned: ${lastScannedStr}
+                        Beszkennelve: ${lastScannedStr}
+                    </div>
+                    </div>
+                    <div>
+                        Legutóbb Módosítva: ${lastModifiedStr}
                     </div>
                     <div>
                         Last Modified: ${lastModifiedStr}
@@ -588,17 +605,17 @@ function pokestopLabel(expireTime, latitude, longitude) {
 
         str = `
             <div>
-                <b>Lured Pokéstop</b>
+                <b>Lure-ozott Pokéstop</b>
             </div>
             <div>
-                Lure expires at ${pad(expireDate.getHours())}:${pad(expireDate.getMinutes())}:${pad(expireDate.getSeconds())}
+                Lure lejárta: ${pad(expireDate.getHours())}:${pad(expireDate.getMinutes())}:${pad(expireDate.getSeconds())}
                 <span class='label-countdown' disappears-at='${expireTime}'>(00m00s)</span>
             </div>
             <div>
-                Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+                Hely: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
             </div>
             <div>
-                <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Get directions</a>
+                <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Google Maps Megnyitása'>Útvonal</a>
             </div>`
     } else {
         str = `
@@ -606,10 +623,10 @@ function pokestopLabel(expireTime, latitude, longitude) {
                 <b>Pokéstop</b>
             </div>
             <div>
-                Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+                Hely: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
             </div>
             <div>
-                <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Get directions</a>
+                <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Google Maps Megnyitása'>Útvonal</a>
             </div>`
     }
 
@@ -758,7 +775,9 @@ function customizePokemonMarker(marker, item, skipNotification) {
     }
 
     marker.infoWindow = new google.maps.InfoWindow({
+
         content: pokemonLabel(item),
+
         disableAutoPan: true
     })
 
@@ -1128,8 +1147,74 @@ function showInBoundsMarkers(markers, type) {
         }
     })
 }
+function checkToken() {
 
+	
+	console.log('check token')
+    var id_token = localStorage.getItem('id_token');
+	if (id_token) {
+		
+		var lock = new Auth0Lock('7IGpKBmL9sMljdFRUx2TNsNveNMFzbyX', 'pokemonbudapestvip.auth0.com');
+		var btn_login = document.getElementById('btn-login');
+		var btn_logout = document.getElementById('btn-logout');
+		lock.getProfile(id_token, function (err, profile) {
+			if (err) {			
+			  console.log('remove token');
+				localStorage.removeItem('id_token');
+				btn_login.style.display = "inline";
+				btn_logout.style.display = "none";
+				document.getElementById('info-msg').innerHTML = '';
+			  return alert('There was an error getting the profile: ' + err.message);	
+			}
+			
+			var expiration = new Date(profile.app_metadata.expiration);
+			var year = expiration.getFullYear();
+			var month = expiration.getMonth()+1;
+			var day = expiration.getDate();
+			var hours = '0' + expiration.getHours();
+			var minutes = '0' + expiration.getMinutes();
+			var date = new Date();
+					
+			if (expiration >= date) {
+				console.log('valid token')
+
+				if (profile.roles.indexOf('trial') != -1) {
+					document.getElementById('info-msg').innerHTML = 'Próbaidőszak ' + year + '.' + month + '.' + day + ' - ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2) + '-ig'
+					} else {
+					document.getElementById('info-msg').innerHTML = 'Előfizetés ' + year + '.' + month + '.' + day + ' - ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2) + '-ig'
+					}
+				
+				
+				btn_login.style.display = "none";
+				btn_logout.style.display = "inline";	
+
+			} else {
+				if (!$timeoutDialog) {
+					var opts = {
+						title: 'Merre vannak a pokemonok?'
+					}
+
+					$timeoutDialog = $('<div>Keresd a /pokemonbudapest facebook csoportot, a további térképhasználatért!</div>').dialog(opts)
+					$timeoutDialog.dialog('open')
+				} else if (!$timeoutDialog.dialog('isOpen')) {
+					$timeoutDialog.dialog('open')
+				}
+				console.log('remove token')
+				localStorage.removeItem('id_token');
+				btn_login.style.display = "inline";
+				btn_logout.style.display = "none";
+				if (profile.roles.indexOf('trial') != -1) {
+					document.getElementById('info-msg').innerHTML = 'Lejárt a próbaidőszak!'
+					} else {
+					document.getElementById('info-msg').innerHTML = 'Lejárt az előfizetés ' + year + '.' + month + '.' + day + ' - ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2) + '-kor'
+					}
+			}
+		});
+	}
+}
 function loadRawData() {
+    var id_token = localStorage.getItem('id_token');
+	if (id_token) {
     var loadPokemon = Store.get('showPokemon')
     var loadGyms = Store.get('showGyms')
     var loadPokestops = Store.get('showPokestops')
@@ -1183,7 +1268,7 @@ function loadRawData() {
         },
         error: function () {
             // Display error toast
-            toastr['error']('Please check connectivity or reduce marker settings.', 'Error getting data')
+            toastr['error']('Kérlek ellenőrizd a kapcsolatot, vagy szűkítsd a beállításokat!', 'Hiba az adatok betöltése közben')
             toastr.options = {
                 'closeButton': true,
                 'debug': false,
@@ -1206,6 +1291,7 @@ function loadRawData() {
             rawDataIsLoading = false
         }
     })
+	}
 }
 
 function processPokemons(i, item) {
@@ -1770,16 +1856,20 @@ function showGymDetails(id) { // eslint-disable-line no-unused-vars
         var gymLevel = getGymLevel(result.gym_points)
         var nextLvlPrestige = gymPrestige[gymLevel - 1] || 50000
         var prestigePercentage = (result.gym_points / nextLvlPrestige) * 100
+
         var lastScannedDateStr = getDateStr(result.last_scanned)
+
         var lastModifiedDateStr = getDateStr(result.last_modified)
         var freeSlots = result.pokemon.length ? gymLevel - result.pokemon.length : 0
-        var freeSlotsStr = freeSlots ? ` - ${freeSlots} Free Slots` : ''
+        var freeSlotsStr = freeSlots ? ` - ${freeSlots} Szabad Hely` : ''
         var gymLevelStr = ''
 
         if (result.team_id === 0) {
             gymLevelStr = `
                 <center>
-                    <b>Uncontested - 1 Free Slot</b>
+
+                    <b>Üres - 1 Szabad Hely</b>
+
                 </center>`
         } else {
             gymLevelStr = `<div>
@@ -1802,13 +1892,13 @@ function showGymDetails(id) { // eslint-disable-line no-unused-vars
                 </div>
                 ${gymLevelStr}
                 <div style="font-size: .7em;">
-                    Last Scanned: ${lastScannedDateStr}
+                    Beszkennelve: ${lastScannedDateStr}
                 </div>
                 <div style="font-size: .7em;">
-                    Last Modified: ${lastModifiedDateStr}
+                    Legutóbb Módosítva: ${lastModifiedDateStr}
                 </div>
                 <div>
-                    <a href='javascript:void(0);' onclick='javascript:openMapDirections(${result.latitude},${result.longitude});' title='View in Maps'>Get directions</a>
+                    <a href='javascript:void(0);' onclick='javascript:openMapDirections(${result.latitude},${result.longitude});' title='Google Maps Megnyitása'>Útvonal</a>
                 </div>
             </center>
         `
@@ -2204,17 +2294,17 @@ $(function () {
 
         // setup the filter lists
         $selectExclude.select2({
-            placeholder: i8ln('Select Pokémon'),
+            placeholder: i8ln('Válassz Pokémont'),
             data: pokeList,
             templateResult: formatState
         })
         $selectPokemonNotify.select2({
-            placeholder: i8ln('Select Pokémon'),
+            placeholder: i8ln('Válassz Pokémont'),
             data: pokeList,
             templateResult: formatState
         })
         $selectRarityNotify.select2({
-            placeholder: i8ln('Select Rarity'),
+            placeholder: i8ln('Válassz Ritkaságot'),
             data: [i8ln('Common'), i8ln('Uncommon'), i8ln('Rare'), i8ln('Very Rare'), i8ln('Ultra Rare')],
             templateResult: formatState
         })
@@ -2265,6 +2355,7 @@ $(function () {
     window.setInterval(updateLabelDiffTime, 1000)
     window.setInterval(updateMap, 5000)
     window.setInterval(updateGeoLocation, 1000)
+	window.setInterval(checkToken, 10000)
 
     createUpdateWorker()
 

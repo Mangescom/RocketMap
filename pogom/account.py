@@ -14,6 +14,7 @@ from .fakePogoApi import FakePogoApi
 from .utils import in_radius, generate_device_info, equi_rect_distance
 from .proxy import get_new_proxy
 
+
 log = logging.getLogger(__name__)
 
 
@@ -245,6 +246,7 @@ def complete_tutorial(api, account, tutorial_state):
 # Complete tutorial with a level up by a Pokestop spin.
 # API argument needs to be a logged in API instance.
 # Called during fort parsing in models.py
+
 def tutorial_pokestop_spin(api, player_level, forts, step_location, account):
     if player_level > 1:
         log.debug(

@@ -2,11 +2,11 @@
 <html lang="{{lang}}">
   <head>
     <meta charset="utf-8">
-    <title>Rocket Map</title>
+    <title>Budapesti Valor Map</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="PokeMap">
+    <meta name="apple-mobile-web-app-title" content="ValorMap">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#3b3b3b">
     <!-- Fav- & Apple-Touch-Icons -->
@@ -32,25 +32,42 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.css">
     <script src="{{ url_for('static', filename='js/vendor/modernizr.custom.js').lstrip('/') }}"></script>
+
     <!-- Toastr -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+
+
+  <!-- Auth0 lock script -->
+  <script src="https://cdn.auth0.com/js/lock/10.8/lock.min.js"></script>
+
+  <!-- Setting the right viewport -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+
+
   </head>
   <body id="top">
     <div class="wrapper">
       <!-- Header -->
       <header id="header">
-        <a href="#nav"><span class="label">Options</span></a>
-        <h1><a href="#">Rocket Map</a></h1>
-        <a href="#stats" id="statsToggle" class="statsNav" style="float: right;"><span class="label">Stats</span></a>
+        <a href="#nav"><span class="label">Beállítások</span></a>
+        <h1><a href="#">Pokémon Budapest</a></h1>
+
+        <button type="submit" id="btn-login" style="display:inline;margin:auto;">Bejelentkezés</button>
+        <img alt="avatar" id="avatar" style="display:none;margin:auto;" >
+        <button type="submit" id="btn-logout" style="display:none;margin:auto;">Kijelentkezés</button>
+		<span id="info-msg" class="label" ></span>
+        <a href="#stats" id="statsToggle" class="statsNav" style="float: right;"><span class="label"> </span></a>
       </header>
       <!-- NAV -->
       <nav id="nav">
         <div id="nav-accordion">
-          <h3>Marker Settings</h3>
+          <h3>Jelölő beállítások</h3>
           <div>
               {% if show.pokemons %}
             <div class="form-control switch-container">
-              <h3>Pokémon</h3>
+              <h3>Pokémonok</h3>
               <div class="onoffswitch">
                 <input id="pokemon-switch" type="checkbox" name="pokemon-switch" class="onoffswitch-checkbox" checked>
                 <label class="onoffswitch-label" for="pokemon-switch">
@@ -62,7 +79,7 @@
               {% endif %}
               {% if show.gyms %}
             <div class="form-control switch-container">
-              <h3>Gyms</h3>
+              <h3>Gymek</h3>
               <div class="onoffswitch">
                 <input id="gyms-switch" type="checkbox" name="gyms-switch" class="onoffswitch-checkbox" checked>
                 <label class="onoffswitch-label" for="gyms-switch">
@@ -74,7 +91,7 @@
 
               {% if show.gym_info %}
             <div class="form-control switch-container" id="gym-sidebar-wrapper" style="display:none">
-              <h3>Use Gym Sidebar</h3>
+              <h3>Oldalsó Gym Panel</h3>
               <div class="onoffswitch">
                 <input id="gym-sidebar-switch" type="checkbox" name="gym-sidebar-switch" class="onoffswitch-checkbox" checked>
                 <label class="onoffswitch-label" for="gym-sidebar-switch">
@@ -86,26 +103,26 @@
               {% endif %}
             <div id="gyms-filter-wrapper" style="display:none">
               <div class="form-control switch-container" id="team-gyms-only-wrapper">
-                <h3>Team</h3>
+                <h3>Csapat</h3>
                 <select name="team-gyms-filter-switch" id="team-gyms-only-switch">
-                  <option value="0">All</option>
+                  <option value="0">Mind</option>
                   <option value="1">Mystic</option>
                   <option value="2">Valor</option>
                   <option value="3">Instinct</option>
                 </select>
               </div>
               <div class="form-control switch-container" id="open-gyms-only-wrapper">
-                <h3>Open Spot</h3>
+                <h3>Szabad helyek</h3>
                 <select name="open-gyms-only-switch" id="open-gyms-only-switch">
-                  <option value="0">All</option>
-                  <option value="1">Open Spot</option>
-                  <option value="2">&lt;= 1000 Prestige Until Open Spot</option>
-                  <option value="3">&lt;= 2500 Prestige Until Open Spot</option>
-                  <option value="4">&lt;= 5000 Prestige Until Open Spot</option>
+                  <option value="0">Mind</option>
+                  <option value="1">Van Szabad Hely</option>
+                  <option value="2">&lt;= 1000 Prestige a Szabad Helyig</option>
+                  <option value="3">&lt;= 2500 Prestige a Szabad Helyig</option>
+                  <option value="4">&lt;= 5000 Prestige a Szabad Helyig</option>
                 </select>
               </div>
               <div class="form-control switch-container" id="min-level-gyms-filter-wrapper">
-                <h3>Minimum Level</h3>
+                <h3>Minimum Szint</h3>
                 <select name="min-level-gyms-filter-switch" id="min-level-gyms-filter-switch">
                   <option value="0">0</option>
                   <option value="1">1</option>
@@ -121,7 +138,7 @@
                 </select>
               </div>
               <div class="form-control switch-container" id="max-level-gyms-filter-wrapper">
-                <h3>Maximum Level</h3>
+                <h3>Maximum Szint</h3>
                 <select name="max-level-gyms-filter-switch" id="max-level-gyms-filter-switch">
                   <option value="0">0</option>
                   <option value="1">1</option>
@@ -137,21 +154,21 @@
                 </select>
               </div>
                <div class="form-control switch-container" id="last-update-gyms-wrapper">
-                 <h3>Last Scan</h3>
+                 <h3>Utoljára Szkennelve</h3>
                 <select name="last-update-gyms-switch" id="last-update-gyms-switch">
-                  <option value="0">All</option>
-                  <option value="1">Last Hour</option>
-                  <option value="6">Last 6 Hours</option>
-                  <option value="12">Last 12 Hours</option>
-                  <option value="24">Last 24 Hours</option>
-                  <option value="168">Last Week</option>
+                  <option value="0">Mind</option>
+                  <option value="1">Az Elmúlt Órában</option>
+                  <option value="6">Az Elmúlt 6 Órában</option>
+                  <option value="12">Az Elmúlt 12 Órában</option>
+                  <option value="24">Az Elmúlt 14 Órában</option>
+                  <option value="168">Az Elmúlt Héten</option>
                 </select>
               </div>
             </div>
               {% endif %}
               {% if show.pokestops %}
             <div class="form-control switch-container">
-              <h3>Pokéstops</h3>
+              <h3>Pokéstopok</h3>
               <div class="onoffswitch">
                 <input id="pokestops-switch" type="checkbox" name="pokestops-switch" class="onoffswitch-checkbox" checked>
                 <label class="onoffswitch-label" for="pokestops-switch">
@@ -162,13 +179,13 @@
             </div>
             <div class="form-control switch-container" id="lured-pokestops-only-wrapper" style="display:none">
               <select name="lured-pokestops-only-switch" id="lured-pokestops-only-switch">
-                <option value="0">All</option>
-                <option value="1">Only Lured</option>
+                <option value="0">Mindegyik</option>
+                <option value="1">Csak a Lure-ozott</option>
               </select>
             </div>
               {% endif %}
             <div class="form-control switch-container">
-              <h3>Scanned Locations</h3>
+              <h3>Szkennelt Helyek</h3>
               <div class="onoffswitch">
                 <input id="scanned-switch" type="checkbox" name="scanned-switch" class="onoffswitch-checkbox">
                 <label class="onoffswitch-label" for="scanned-switch">
@@ -178,7 +195,7 @@
               </div>
             </div>
             <div class="form-control switch-container">
-              <h3>Spawn Points</h3>
+              <h3>Megjelenési Pontok</h3>
               <div class="onoffswitch">
                 <input id="spawnpoints-switch" type="checkbox" name="spawnpoints-switch" class="onoffswitch-checkbox">
                 <label class="onoffswitch-label" for="spawnpoints-switch">
@@ -188,7 +205,7 @@
               </div>
             </div>
             <div class="form-control switch-container">
-              <h3>Ranges</h3>
+              <h3>Látótávolság</h3>
               <div class="onoffswitch">
                 <input id="ranges-switch" type="checkbox" name="ranges-switch" class="onoffswitch-checkbox">
                 <label class="onoffswitch-label" for="ranges-switch">
@@ -200,7 +217,7 @@
               {% if show.pokemons %}
             <div class="form-control">
               <label for="exclude-pokemon">
-              <h3>Hide Pokémon</h3>
+              <h3>Pokémon Elrejtése</h3>
               <div style="max-height:165px;overflow-y:auto">
                 <select id="exclude-pokemon" multiple="multiple"></select>
               </div>
@@ -209,13 +226,14 @@
               {% endif %}
           </div>
 
-          <h3>Location &amp; Search Settings</h3>
+
+          <h3>Hely &amp; Keresési Beállítások</h3>
 
           <div>
               {% if show.fixed_display %}
             <div class="form-control switch-container">
               <label for="next-location">
-              <h3>Change search location</h3>
+              <h3>Helyzet</h3>
               <input id="next-location" type="text" name="next-location" placeholder="Change search location">
               </label>
             </div>
@@ -241,7 +259,9 @@
             </div>
               {% endif %}
             <div class="form-control switch-container" >
-              <h3>Start map at my position</h3>
+
+              <h3>Betöltés a Helyzetemen</h3>
+
               <div class="onoffswitch">
                 <input id="start-at-user-location-switch" type="checkbox" name="start-at-user-location-switch" class="onoffswitch-checkbox" checked/>
                 <label class="onoffswitch-label" for="start-at-user-location-switch">
@@ -250,9 +270,12 @@
                 </label>
               </div>
             </div>
+
               {% if show.search_display %}
             <div class="form-control switch-container">
-              <h3>Search</h3>
+
+              <h3>Keresés</h3>
+
               <div class="onoffswitch">
                 <input id="search-switch" type="checkbox" name="search-switch" class="onoffswitch-checkbox" checked/>
                 <label class="onoffswitch-label" for="search-switch">
@@ -263,7 +286,7 @@
             </div>
               {% endif %}
             <div class="form-control switch-container">
-              <h3>Follow me</h3>
+              <h3>Kövessen</h3>
               <div class="onoffswitch">
                 <input id="follow-my-location-switch" type="checkbox" name="follow-my-location-switch" class="onoffswitch-checkbox" checked/>
                 <label class="onoffswitch-label" for="follow-my-location-switch">
@@ -288,11 +311,13 @@
 
 
             {% if show.pokemons %}
-          <h3>Notification Settings</h3>
+
+          <h3>Értesítési beállítások</h3>
+
           <div>
             <div class="form-control">
               <label for="notify-pokemon">
-                <h3>Notify of Pokémon</h3>
+                <h3>Értesítés Pokémon Szerint</h3>
                 <div style="max-height:165px;overflow-y:auto">
                   <select id="notify-pokemon" multiple="multiple"></select>
                 </div>
@@ -300,7 +325,7 @@
             </div>
             <div class="form-control">
               <label for="notify-rarity">
-                <h3>Notify of Rarity</h3>
+                <h3>Értesítés Ritkaság Szerint</h3>
                 <div style="max-height:165px;overflow-y:auto">
                   <select id="notify-rarity" multiple="multiple"></select>
                 </div>
@@ -310,13 +335,13 @@
               {% if show.encounter %}
             <div class="form-control">
               <label for="notify-perfection">
-                <h3>Notify of Perfection</h3>
+                <h3>Értesítés Tökéletesség Szerint</h3>
                 <input id="notify-perfection" type="text" name="notify-perfection" placeholder="Minimum perfection %"/>
               </label>
             </div>
               {% endif %}
             <div class="form-control switch-container">
-              <h3>Notify with sound</h3>
+              <h3>Értesítés Hanggal</h3>
               <div class="onoffswitch">
                 <input id="sound-switch" type="checkbox" name="sound-switch" class="onoffswitch-checkbox" checked>
                 <label class="onoffswitch-label" for="sound-switch">
@@ -326,36 +351,47 @@
               </div>
             </div>
           </div>
+
             {% endif %}
-          <h3>Style Settings</h3>
+
+
+          <h3>Stílus Beállítások</h3>
+
           <div>
             <div class="form-control switch-container">
-              <h3>Map Style</h3>
+              <h3>Térkép Stílusa</h3>
               <select id="map-style"></select>
             </div>
             <div class="form-control switch-container">
-              <h3>Icon Size</h3>
+              <h3>Ikonok Mérete</h3>
               <select name="pokemon-icon-size" id="pokemon-icon-size">
-                <option value="-8">Small</option>
+                <option value="-8">Kicsi</option>
                 <option value="0">Normal</option>
-                <option value="10">Large</option>
-                <option value="20">X-Large</option>
+                <option value="10">Nagy</option>
+                <option value="20">Legnagyobb</option>
               </select>
             </div>
             <div class="form-control switch-container">
-              <h3>Search Icon Marker</h3>
+              <h3>Keresési Ikon</h3>
               <select name="iconmarker-style" id="iconmarker-style"></select>
             </div>
 
             <div class="form-control switch-container">
+
                 {% if show.gyms %}
-              <h3>Gym Marker Style</h3>
+
+
+              <h3>Gym Ikonok</h3>
+
               <select name="gym-marker-style" id="gym-marker-style">
-                <option value='ingame'>In-Game</option>
-                <option value='shield'>Shield</option>
+                <option value='ingame'>Játékbeli</option>
+                <option value='shield'>Pajzs</option>
               </select>
+
                 {% endif %}
-              <h3>Location Icon Marker</h3>
+
+              <h3>Helyzet Ikon</h3>
+
               <select name="locationmarker-style" id="locationmarker-style"></select>
             </div>
           </div>
@@ -364,10 +400,10 @@
       <nav id="stats">
         <div class="switch-container">
           <div class="switch-container">
-            <div><center><a href="stats">Full Stats</a></center></div>
+            <div><center><a href="stats">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></center></div>
           </div>
           <div class="switch-container">
-            <center><h1 id="stats-ldg-label">Loading...</h1></center>
+            <center><h1 id="stats-ldg-label">Töltés...</h1></center>
           </div>
           <div class="stats-label-container">
             <center><h1 id="stats-pkmn-label"></h1></center>
@@ -376,7 +412,7 @@
             <table id="pokemonList_table" class="display" cellspacing="0" width="100%">
               <thead>
                 <tr>
-                  <th>Icon</th> <th>Name</th> <th>Count</th> <th>%</th>
+                  <th>Ikon</th> <th>Név</th> <th>db</th> <th>%</th>
                 </tr>
               </thead>
               <tbody></tbody>
@@ -394,7 +430,7 @@
         </div>
       </nav>
       <nav id="gym-details">
-        <center><h1>Loading...</h1></center>
+        <center><h1>Töltés...</h1></center>
       </nav>
       <div id="map"></div>
       <div class="fab" id="scan-here" style="display:none"></div>

@@ -427,7 +427,7 @@ class SpawnScan(BaseScheduler):
                 appears = now() + 3600 - late_by
 
             location['appears'] = appears
-            location['leaves'] = appears + 900
+            location['leaves'] = appears + 1800
 
         # Put the spawn points in order of next appearance time.
         self.locations.sort(key=itemgetter('appears'))

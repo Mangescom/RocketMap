@@ -847,15 +847,15 @@ var StoreTypes = {
 // set the default parameters for you map here
 var StoreOptions = {
     'map_style': {
-        default: 'roadmap', // roadmap, satellite, hybrid, nolabels_style, dark_style, style_light2, style_pgo, dark_style_nl, style_pgo_day, style_pgo_night, style_pgo_dynamic
+        default: 'style_pgo_dynamic', // roadmap, satellite, hybrid, nolabels_style, dark_style, style_light2, style_pgo, dark_style_nl, style_pgo_day, style_pgo_night, style_pgo_dynamic
         type: StoreTypes.String
     },
     'remember_select_exclude': {
-        default: [],
+        default: [10,11,13,14,16,17,18,19,20,21,22,23,27,29,30,32,33,41,42,43,46,48,50,52,54,56,69,72,74,77,81,84,86,90,92,93,96,97,98,99,100,104,116,118,119,120,124,161,162,163,165,167,169,170,177,178,183,187,190,194,198,220,221],
         type: StoreTypes.JSON
     },
     'remember_select_notify': {
-        default: [],
+        default: [131,132,143,144,145,146,149,150,151,201,242,243,244,246,247,248,249,250,251],
         type: StoreTypes.JSON
     },
     'remember_select_rarity_notify': {
@@ -863,7 +863,7 @@ var StoreOptions = {
         type: StoreTypes.JSON
     },
     'remember_text_perfection_notify': {
-        default: '',
+        default: '99',
         type: StoreTypes.Number
     },
     'showGyms': {
@@ -899,7 +899,7 @@ var StoreOptions = {
         type: StoreTypes.Boolean
     },
     'showPokestops': {
-        default: true,
+        default: false,
         type: StoreTypes.Boolean
     },
     'showLuredPokestopsOnly': {
@@ -931,7 +931,7 @@ var StoreOptions = {
         type: StoreTypes.Boolean
     },
     'startAtUserLocation': {
-        default: false,
+        default: true,
         type: StoreTypes.Boolean
     },
     'followMyLocation': {
@@ -955,11 +955,11 @@ var StoreOptions = {
         type: StoreTypes.String
     },
     'iconSizeModifier': {
-        default: 0,
+        default: 20,
         type: StoreTypes.Number
     },
     'searchMarkerStyle': {
-        default: 'google',
+        default: 'none',
         type: StoreTypes.String
     },
     'locationMarkerStyle': {

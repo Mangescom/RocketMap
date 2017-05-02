@@ -94,8 +94,134 @@
     $body.classList.add('is-loading')
 
     window.addEventListener('load', function () {
-        $body.classList.remove('is-loading')
-    })
+
+ //----
+ 
+		var options = {
+		  languageDictionary: {
+			error: {
+			  login: {
+				'lock.unauthorized': 'Lejárt a próbaidőszak! Lépj kapcsolatba a /pokemonbudapest facebook csoporttal, hogy továbbra is használni tudd a térképet!'
+			  }
+			}
+		  },
+		  language: 'hu',
+		  auth: {
+				params: {scope: 'openid roles app_metadata'},
+		  }
+		};  
+		
+		var lock = new Auth0Lock('7IGpKBmL9sMljdFRUx2TNsNveNMFzbyX', 'pokemonbudapestvip.auth0.com',options);
+		// localStorage.removeItem('id_token');
+		
+		  // buttons
+		  var btn_login = document.getElementById('btn-login');
+		  var btn_logout = document.getElementById('btn-logout');
+
+		  btn_login.addEventListener('click', function() {
+			lock.show();
+		  });
+
+		  btn_logout.addEventListener('click', function() {
+			 logout();
+		  });
+
+		  lock.on("authenticated", function(authResult) {
+			console.log('authenticated')
+			lock.getProfile(authResult.idToken, function(error, profile) {
+			  if (error) {
+				logout();
+				return;
+			  }
+
+			  // Display user information
+				show_profile_info(profile,authResult);
+				//window.location.href = "/";
+			});
+		  });
+		  lock.on('authorization_error', function(error) {
+				console.log('remove token')
+				localStorage.removeItem('id_token');
+			});
+
+
+		  var retrieve_profile = function() {
+			var id_token = localStorage.getItem('id_token');
+			console.log('retrieve profile')
+			if (id_token) {
+				console.log('van token')
+			  lock.getProfile(id_token, function (err, profile) {
+				if (err) {
+				  logout();
+				  return alert('There was an error getting the profile: ' + err.message);
+				}
+				
+				show_profile_info(profile);
+				});
+			}
+		  };
+
+		  var show_profile_info = function(profile,authResult) {
+			var expiration = new Date(profile.app_metadata.expiration);
+			var year = expiration.getFullYear();
+			var month = expiration.getMonth()+1;
+			var day = expiration.getDate();
+			var hours = '0' + expiration.getHours();
+			var minutes = '0' + expiration.getMinutes();
+			
+			if (profile.roles.indexOf('expired') != -1) {
+				if (profile.roles.indexOf('trial') != -1) {
+					document.getElementById('info-msg').innerHTML = 'Lejárt a próbaidőszak!'
+				} else {
+					document.getElementById('info-msg').innerHTML = 'Lejárt az előfizetés ' + year + '.' + month + '.' + day + ' - ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2) + '-kor'
+					}
+				if (!$timeoutDialog) {
+					var opts = {
+						title: 'Merre vannak a pokemonok?'
+					}
+
+					$timeoutDialog = $('<div>Keresd a /pokemonbudapest facebook csoportot, a további térképhasználatért !</div>').dialog(opts)
+					$timeoutDialog.dialog('open')
+				} else if (!$timeoutDialog.dialog('isOpen')) {
+					$timeoutDialog.dialog('open')
+				}
+				}
+			if (profile.roles.indexOf('paid') != -1) {
+				console.log('save token')
+				localStorage.setItem('id_token', authResult.idToken);
+				if (profile.roles.indexOf('trial') != -1) {
+					document.getElementById('info-msg').innerHTML = 'Próbaidőszak ' + year + '.' + month + '.' + day + ' - ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2) + '-ig'
+				} else {
+					document.getElementById('info-msg').innerHTML = 'Előfizetés ' + year + '.' + month + '.' + day + ' - ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2) + '-ig'
+					}
+				
+				var avatar = document.getElementById('avatar');
+				btn_login.style.display = "none";
+				btn_logout.style.display = "inline";
+				}
+			// document.getElementById('nickname').textContent = profile.nickname;
+		 //   avatar.src = profile.picture;
+		 //   avatar.style.display = "none";
+		  };
+
+
+		  var logout = function() {
+			console.log('remove token')
+			localStorage.removeItem('id_token');
+			btn_login.style.display = "inline";
+			btn_logout.style.display = "none";
+			document.getElementById('info-msg').innerHTML = '';
+			window.location.href = "/";
+		  };
+
+
+		  retrieve_profile();
+
+ //-----
+
+         $body.classList.remove('is-loading')
+
+    });
 
     // Nav.
     var $nav = document.querySelector('#nav')

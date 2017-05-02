@@ -9,6 +9,7 @@ import traceback
 import gc
 import time
 import geopy
+import cluster
 import math
 from peewee import InsertQuery, \
     Check, CompositeKey, ForeignKeyField, \
@@ -35,6 +36,7 @@ from .transform import transform_from_wgs_to_gcj, get_new_coords
 from .customLog import printPokemon
 from .account import (tutorial_pokestop_spin, get_player_level, check_login,
                       setup_api, encounter_pokemon_request)
+
 
 log = logging.getLogger(__name__)
 
@@ -392,22 +394,32 @@ class Pokemon(BaseModel):
 
         n, e, s, w = hex_bounds(center, steps)
 
-        query = (Pokemon
-                 .select(Pokemon.latitude.alias('lat'),
-                         Pokemon.longitude.alias('lng'),
-                         (date_secs(Pokemon.disappear_time)).alias('time'),
-                         Pokemon.spawnpoint_id
+        #query = (Pokemon
+        #         .select(Pokemon.latitude.alias('lat'),
+        #                 Pokemon.longitude.alias('lng'),
+        #                 (date_secs(Pokemon.disappear_time)).alias('time'),
+        #                 Pokemon.spawnpoint_id
+        #                 ))
+        query = (SpawnPoint
+                 .select(SpawnPoint.latitude.alias('lat'),
+                         SpawnPoint.longitude.alias('lng'),
+                         SpawnPoint.earliest_unseen.alias('earliest_unseen'),
+                         SpawnPoint.latest_seen.alias('latest_seen'),
+                         SpawnPoint.id.alias('spawnpoint_id'),
+                         SpawnPoint.kind.alias('kind'),
+                         SpawnPoint.links.alias('links')
                          ))
-        query = (query.where((Pokemon.latitude <= n) &
-                             (Pokemon.latitude >= s) &
-                             (Pokemon.longitude >= w) &
-                             (Pokemon.longitude <= e)
+        query = (query.where((SpawnPoint.latitude <= n) &
+                             (SpawnPoint.latitude >= s) &
+                             (SpawnPoint.longitude >= w) &
+                             (SpawnPoint.longitude <= e) &
+                             (SpawnPoint.missed_count < 5)
                              ))
         # Sqlite doesn't support distinct on columns.
-        if args.db_type == 'mysql':
-            query = query.distinct(Pokemon.spawnpoint_id)
-        else:
-            query = query.group_by(Pokemon.spawnpoint_id)
+        #if args.db_type == 'mysql':
+        #    query = query.distinct(Pokemon.spawnpoint_id)
+        #else:
+        #    query = query.group_by(Pokemon.spawnpoint_id)
 
         s = list(query.dicts())
 
@@ -429,7 +441,22 @@ class Pokemon(BaseModel):
             # todo: this DOES NOT ACCOUNT for Pokemon that appear sooner and
             # live longer, but you'll _always_ have at least 15 minutes, so it
             # works well enough.
-            location['time'] = cls.get_spawn_time(location['time'])
+            endpoints = SpawnPoint.start_end(location)
+            location['time'] = endpoints[0]
+            # if location['kind'] == 'hhss':
+            #    location['time'] = (location['time'] + 1800) % 3600
+            # elif location['kind'] == 'hhhs':
+            #     location['time'] = (location['time'] + 2700) % 3600
+            # elif location['kind'] == 'ssss':
+            #     location['time'] = location['time']
+            # elif location['kind'] == 'hsss':
+            #     location['time'] = (location['time'] + 900) % 3600
+            # elif location['kind'] == 'hshs':
+            #     location['time'] = (location['time'] + 900) % 3600
+            #location['time'] = cls.get_spawn_time(location['time'])
+
+        if args.sscluster:
+            filtered = cluster.main(filtered)
 
         return filtered
 
@@ -2059,6 +2086,11 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
                 else:
                     log.error('No L30 accounts are available, please'
                               + ' consider adding more. Skipping encounter.')
+
+                #captcha_url = encounter_result['responses']['CHECK_CHALLENGE'][
+                #        'challenge_url']  # Check for captcha
+                #if len(captcha_url) > 1:  # Throw warning but finish parsing
+                #    log.debug('Account encountered a reCaptcha.')
 
             pokemon[p['encounter_id']] = {
                 'encounter_id': b64encode(str(p['encounter_id'])),
