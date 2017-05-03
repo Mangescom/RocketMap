@@ -170,27 +170,6 @@ def get_args():
                               + ' the number of logins per account, but '
                               + ' decreases memory usage.'),
                         action='store_true', default=False)
-    webhook_list = parser.add_mutually_exclusive_group()
-    webhook_list.add_argument('-wwht', '--webhook-whitelist',
-                              action='append', default=[],
-                              help=('List of Pokemon to send to '
-                                    'webhooks. Specified as Pokemon ID.'))
-    webhook_list.add_argument('-wblk', '--webhook-blacklist',
-                              action='append', default=[],
-                              help=('List of Pokemon NOT to send to '
-                                    'webhooks. Specified as Pokemon ID.'))
-    webhook_list.add_argument('-wwhtf', '--webhook-whitelist-file',
-                              default='', help='File containing a list of '
-                                               'Pokemon to send to '
-                                               'webhooks. Pokemon are '
-                                               ' specified by their name, '
-                                               ' one on each line.')
-    webhook_list.add_argument('-wblkf', '--webhook-blacklist-file',
-                              default='', help='File containing a list of '
-                                               'Pokemon NOT to send to'
-                                               'webhooks. Pokemon are '
-                                               ' specified by their name, '
-                                               ' one on each line.')
     parser.add_argument('-ld', '--login-delay',
                         help='Time delay between each login attempt.',
                         type=float, default=6)
@@ -401,7 +380,6 @@ def get_args():
                               action='append', default=[],
                               help=('List of Pokemon to NOT send to'
                                     ' webhooks.'))
-
     webhook_list.add_argument('-wwhtf', '--webhook-whitelist-file',
                               default='', help='File containing a list of '
                                                'Pokemon to send to'
@@ -456,13 +434,6 @@ def get_args():
     parser.add_argument('-sl', '--speed_limit',
                         help='Maximum speed between jumps in KM/hr, default 32 kph',
                         type=float, default=32)
-    parser.add_argument('-novc', '--no-version-check', action='store_true',
-                        help='Disable API version check.',
-                        default=False)
-    parser.add_argument('-vci', '--version-check-interval', type=int,
-                        help='Interval to check API version in seconds ' +
-                        '(Default: in [60, 300]).',
-                        default=random.randint(60, 300))
     parser.add_argument('--disable-blacklist',
                         help=('Disable the global anti-scraper IP blacklist.'),
                         action='store_true', default=False)

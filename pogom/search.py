@@ -865,7 +865,7 @@ def search_worker_thread(args, account_queue, account_sets, account_failures,
                         break
 
                 # Grab the next thing to search (when available).
-                step, step_location, appears, leaves, messages, wait = (
+                step, next_location, appears, leaves, messages, wait = (
                     scheduler.next_item(status))
                 status['message'] = messages['wait']
                 # The next_item will return the value telling us how long
