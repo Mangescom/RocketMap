@@ -175,16 +175,28 @@
 				} else {
 					document.getElementById('info-msg').innerHTML = 'Lejárt az előfizetés ' + year + '.' + month + '.' + day + ' - ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2) + '-kor'
 					}
-				if (!$timeoutDialog) {
-					var opts = {
-						title: 'Merre vannak a pokemonok?'
+					if (profile.roles.indexOf('trial') != -1) {
+					toastr['error']('Keresd a /pokemonbudapest facebook csoportot a további térképhasználatért!', 'Lejárt a próbaidőszak')
+					} else {
+					toastr['error']('Köszönjük az előfizetést! Reméljük sokat segített a térkép a ritka pokémonok megatalálásában! :D', 'Lejárt az előfizetés')
 					}
-
-					$timeoutDialog = $('<div>Keresd a /pokemonbudapest facebook csoportot, a további térképhasználatért !</div>').dialog(opts)
-					$timeoutDialog.dialog('open')
-				} else if (!$timeoutDialog.dialog('isOpen')) {
-					$timeoutDialog.dialog('open')
-				}
+					toastr.options = {
+						'closeButton': true,
+						'debug': false,
+						'newestOnTop': true,
+						'progressBar': false,
+						'positionClass': 'toast-top-right',
+						'preventDuplicates': true,
+						'onclick': null,
+						'showDuration': '10000',
+						'hideDuration': '10000',
+						'timeOut': '250000',
+						'extendedTimeOut': '100000',
+						'showEasing': 'swing',
+						'hideEasing': 'linear',
+						'showMethod': 'fadeIn',
+						'hideMethod': 'fadeOut'
+					}
 				}
 			if (profile.roles.indexOf('paid') != -1) {
 				console.log('save token')

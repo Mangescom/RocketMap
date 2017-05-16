@@ -2348,22 +2348,23 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
         else:
             # If the cell has completed, we need to classify all
             # the SPs that were not picked up in the scan
-            if just_completed:
-                SpawnpointDetectionData.classify(sp, scan_loc, now_secs)
-                spawn_points[sp['id']] = sp
-            if SpawnpointDetectionData.unseen(sp, now_secs):
-                spawn_points[sp['id']] = sp
-            endpoints = SpawnPoint.start_end(sp, args.spawn_delay)
-            if clock_between(endpoints[0], now_secs, endpoints[1]):
-                sp['missed_count'] += 1
-                spawn_points[sp['id']] = sp
-                log.warning('%s kind spawnpoint %s has no Pokemon %d times'
-                            ' in a row.',
-                            sp['kind'], sp['id'], sp['missed_count'])
-                log.info('Possible causes: Still doing initial scan, super'
-                         ' rare double spawnpoint during')
-                log.info('hidden period, or Niantic has removed '
-                         'spawnpoint.')
+            if not args.spawnpoint_scanning:
+                if just_completed:
+                    SpawnpointDetectionData.classify(sp, scan_loc, now_secs)
+                    spawn_points[sp['id']] = sp
+                if SpawnpointDetectionData.unseen(sp, now_secs):
+                    spawn_points[sp['id']] = sp
+                endpoints = SpawnPoint.start_end(sp, args.spawn_delay)
+                if clock_between(endpoints[0], now_secs, endpoints[1]):
+                    sp['missed_count'] += 1
+                    spawn_points[sp['id']] = sp
+                    log.warning('%s kind spawnpoint %s has no Pokemon %d times'
+                                ' in a row.',
+                                sp['kind'], sp['id'], sp['missed_count'])
+                    log.info('Possible causes: Still doing initial scan, super'
+                             ' rare double spawnpoint during')
+                    log.info('hidden period, or Niantic has removed '
+                             'spawnpoint.')
 
         if (not SpawnPoint.tth_found(sp) and scan_loc['done'] and
                 (now_secs - sp['latest_seen'] -

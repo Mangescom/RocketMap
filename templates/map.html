@@ -2,7 +2,7 @@
 <html lang="{{lang}}">
   <head>
     <meta charset="utf-8">
-    <title>Budapesti Valor Map</title>
+    <title>Pokémon Budapest - Pokémon Go Térkép - www.facebook.com/pokemonbudapest</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -54,10 +54,9 @@
         <a href="#nav"><span class="label">Beállítások</span></a>
         <h1><a href="#">Pokémon Budapest</a></h1>
 
-        <button type="submit" id="btn-login" style="display:inline;margin:auto;">Bejelentkezés</button>
+        <button type="submit" id="btn-login" style="display:inline;margin-left:10px;">Bejelentkezés</button>
         <img alt="avatar" id="avatar" style="display:none;margin:auto;" >
-        <button type="submit" id="btn-logout" style="display:none;margin:auto;">Kijelentkezés</button>
-		<span id="info-msg" class="label" ></span>
+        <button type="submit" id="btn-logout" style="display:none;margin-left:10px;">Kijelentkezés</button>
         <a href="#stats" id="statsToggle" class="statsNav" style="float: right;"><span class="label"> </span></a>
       </header>
       <!-- NAV -->
@@ -376,25 +375,27 @@
               <select name="iconmarker-style" id="iconmarker-style"></select>
             </div>
 
-            <div class="form-control switch-container">
-
                 {% if show.gyms %}
-
-
+            <div class="form-control switch-container">
               <h3>Gym Ikonok</h3>
-
               <select name="gym-marker-style" id="gym-marker-style">
                 <option value='ingame'>Játékbeli</option>
                 <option value='shield'>Pajzs</option>
               </select>
-
+            </div>
                 {% endif %}
-
+				
+            <div class="form-control switch-container">
               <h3>Helyzet Ikon</h3>
-
               <select name="locationmarker-style" id="locationmarker-style"></select>
             </div>
+			
           </div>
+		  <h3 id="info-msg"></h3>
+		  <div>
+			  <h3>Információ</h3>
+			  <a target="_blank" href="http://www.facebook.com/pokemonbudapest">http://www.facebook.com/pokemonbudapest</a>
+		  </div>
         </div>
       </nav>
       <nav id="stats">

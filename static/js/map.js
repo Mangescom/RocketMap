@@ -441,16 +441,15 @@ function pokemonLabel(item) {
         details = `
             <div>
                 IV: ${iv.toFixed(1)}% (${atk}/${def}/${sta})
-            </div>
             `
 
         if (cp !== null) {
             details += `
-            <div>
-                CP: ${cp}
-            </div>
+                 | CP: ${cp}
             `
         }
+		
+		details +=  `</div>`
 
         details += `
             <div>
@@ -531,7 +530,9 @@ function gymLabel(teamName, teamId, gymPoints, latitude, longitude, lastScanned 
                         <b style='color:rgba(${gymColor[teamId]})'>${teamName}</b><br>
                         <img height='70px' style='padding: 5px;' src='static/forts/${teamName}_large.png'>
                     </div>
-                    ${nameStr}
+                    <div>
+						${nameStr}
+                    </div>
                     <div>
                         Hely: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
                     </div>
@@ -542,9 +543,8 @@ function gymLabel(teamName, teamId, gymPoints, latitude, longitude, lastScanned 
                         Legutóbb Módosítva: ${lastModifiedStr}
                     </div>
                     <div>
-                        Last Modified: ${lastModifiedStr}
+						${directionsStr}
                     </div>
-                    ${directionsStr}
                 </center>
             </div>`
     } else {
@@ -574,14 +574,12 @@ function gymLabel(teamName, teamId, gymPoints, latitude, longitude, lastScanned 
                     <div>
                         Beszkennelve: ${lastScannedStr}
                     </div>
-                    </div>
                     <div>
                         Legutóbb Módosítva: ${lastModifiedStr}
                     </div>
                     <div>
-                        Last Modified: ${lastModifiedStr}
+						${directionsStr}
                     </div>
-                    ${directionsStr}
                 </center>
             </div>`
     }
@@ -1189,16 +1187,28 @@ function checkToken() {
 				btn_logout.style.display = "inline";	
 
 			} else {
-				if (!$timeoutDialog) {
-					var opts = {
-						title: 'Merre vannak a pokemonok?'
+					if (profile.roles.indexOf('trial') != -1) {
+					toastr['error']('Keresd a /pokemonbudapest facebook csoportot a további térképhasználatért!', 'Lejárt a próbaidőszak')
+					} else {
+					toastr['error']('Köszönjük az előfizetést! Reméljük sokat segített a térkép a ritka pokémonok megatalálásában! :D', 'Lejárt az előfizetés')
 					}
-
-					$timeoutDialog = $('<div>Keresd a /pokemonbudapest facebook csoportot, a további térképhasználatért!</div>').dialog(opts)
-					$timeoutDialog.dialog('open')
-				} else if (!$timeoutDialog.dialog('isOpen')) {
-					$timeoutDialog.dialog('open')
-				}
+					toastr.options = {
+						'closeButton': true,
+						'debug': false,
+						'newestOnTop': true,
+						'progressBar': false,
+						'positionClass': 'toast-top-right',
+						'preventDuplicates': true,
+						'onclick': null,
+						'showDuration': '10000',
+						'hideDuration': '10000',
+						'timeOut': '250000',
+						'extendedTimeOut': '100000',
+						'showEasing': 'swing',
+						'hideEasing': 'linear',
+						'showMethod': 'fadeIn',
+						'hideMethod': 'fadeOut'
+					}
 				console.log('remove token')
 				localStorage.removeItem('id_token');
 				btn_login.style.display = "inline";
