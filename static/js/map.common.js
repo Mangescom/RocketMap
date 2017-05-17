@@ -923,7 +923,7 @@ var StoreOptions = {
         type: StoreTypes.Boolean
     },
     'playCries': {
-        default: false,
+        default: true,
         type: StoreTypes.Boolean
     },
     'geoLocate': {
