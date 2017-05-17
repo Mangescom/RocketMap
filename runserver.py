@@ -228,7 +228,7 @@ def main():
     create_tables(db)
 
     # fixing encoding on present and future tables
-    verify_table_encoding(db)
+    #verify_table_encoding(db)
 
     if args.clear_db:
         log.info("Drop and recreate is complete. Now remove -cd and restart.")

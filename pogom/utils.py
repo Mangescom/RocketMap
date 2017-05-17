@@ -161,24 +161,6 @@ def get_args():
                               + ' the number of logins per account, but '
                               + ' decreases memory usage.'),
                         action='store_true', default=False)
-
-    webhook_list = parser.add_mutually_exclusive_group()
-    webhook_list.add_argument('-wwht', '--webhook-whitelist',
-                              action='append', default=[],
-                              help=('List of Pokemon to send to '
-                                    'webhooks. Specified as Pokemon ID.'))
-    webhook_list.add_argument('-wblk', '--webhook-blacklist',
-                              action='append', default=[],
-                              help=('List of Pokemon NOT to send to '
-                                    'webhooks. Specified as Pokemon ID.'))
-    webhook_list.add_argument('-wwhtf', '--webhook-whitelist-file',
-                              default='', help='File containing a list of '
-                                               'Pokemon IDs to be sent to '
-                                               'webhooks.')
-    webhook_list.add_argument('-wblkf', '--webhook-blacklist-file',
-                              default='', help='File containing a list of '
-                                               'Pokemon IDs NOT to be sent to'
-                                               'webhooks.')
     parser.add_argument('-ld', '--login-delay',
                         help='Time delay between each login attempt.',
                         type=float, default=6)

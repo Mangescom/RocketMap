@@ -1942,7 +1942,7 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
                                 'new spawnpoint.')
                     ScannedLocation.reset_bands(scan_loc)
 
-            if (not SpawnPoint.tth_found(sp) or sighting['tth_secs'] or
+            if not args.spawnpoint_scanning and (not SpawnPoint.tth_found(sp) or sighting['tth_secs'] or
                     not scan_loc['done'] or just_completed):
                 SpawnpointDetectionData.classify(sp, scan_loc, now_secs,
                                                  sighting)
