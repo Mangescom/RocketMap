@@ -179,6 +179,9 @@ class HexSearch(BaseScheduler):
         self.empty_queues()
         self.locations = False
 
+    def emptyHive(self):
+        return False
+
     # Generates the list of locations to scan.
     def _generate_locations(self):
         NORTH = 0
@@ -342,6 +345,7 @@ class SpawnScan(BaseScheduler):
         else:
             self.step_distance = 0.070
 
+        self.empty_hive = False
         self.step_limit = args.step_limit
         self.locations = False
 
@@ -369,7 +373,7 @@ class SpawnScan(BaseScheduler):
                 self.scan_location, self.args.step_limit)
 
         # Well shit...
-        # if not self.locations:
+        #if not self.locations:
         #    raise Exception('No availabe spawn points!')
 
         # locations[]:
@@ -424,6 +428,10 @@ class SpawnScan(BaseScheduler):
         # Put the spawn points in order of next appearance time.
         self.locations.sort(key=itemgetter('appears'))
 
+        if not self.locations:
+            self.empty_hive = True
+            log.info('Empty hive')
+
         # Match expected structure:
         # locations = [((lat, lng, alt), ts_appears, ts_leaves),...]
         retset = []
@@ -434,6 +442,9 @@ class SpawnScan(BaseScheduler):
                            location['appears'], location['leaves']))
 
         return retset
+
+    def emptyHive(self):
+        return self.empty_hive
 
     # Schedule the work to be done.
     def schedule(self):
@@ -500,6 +511,9 @@ class SpeedScan(HexSearch):
 
     def _locks_init(self):
         self.lock_next_item = Lock()
+		
+    def emptyHive(self):
+        return False
 
     # On location change, empty the current queue and the locations list
     def location_changed(self, scan_location, db_update_queue):
@@ -693,6 +707,7 @@ class SpeedScan(HexSearch):
         # there are no spawnpoints in the hive.
         if len(queue) == 0:
             self.empty_hive = True
+            log.info('Empty hive')
         if old_q:
             # Enclosing in try: to avoid divide by zero exceptions from
             # killing overseer
