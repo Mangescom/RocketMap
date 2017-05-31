@@ -38,6 +38,7 @@
 
 
 
+
   <!-- Auth0 lock script -->
   <script src="https://cdn.auth0.com/js/lock/10.8/lock.min.js"></script>
 
@@ -45,24 +46,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
 
-
+    <!-- Custom CSS code-->
+      {% if show.custom_css %}
+    <link rel="stylesheet" type="text/css" href="static/css/custom.css">
+      {% endif %}
   </head>
-  <body id="top">
+  <body id="top" class="mapPage">
     <div class="wrapper">
       <!-- Header -->
       <header id="header">
         <a href="#nav"><span class="label">Beállítások</span></a>
-        <h1><a href="#">Pokémon Budapest</a></h1>
+        <h1><a href="./">Pokémon Budapest<i class="fa fa-rocket fa-fw"></i></a></h1>
 
         <button type="submit" id="btn-login" style="display:inline;margin-left:10px;">Bejelentkezés</button>
         <img alt="avatar" id="avatar" style="display:none;margin:auto;" >
         <button type="submit" id="btn-logout" style="display:none;margin-left:10px;">Kijelentkezés</button>
         <a href="#stats" id="statsToggle" class="statsNav" style="float: right;"><span class="label"> </span></a>
+        <a href="status" target="_blank" style="float: right;"><span class="label"> </span></a>
       </header>
       <!-- NAV -->
       <nav id="nav">
         <div id="nav-accordion">
-          <h3>Jelölő beállítások</h3>
+          <h3><i class="fa fa-map-marker fa-fw"></i>Jelölő beállítások</h3>
           <div>
               {% if show.pokemons %}
             <div class="form-control switch-container">
@@ -87,7 +92,6 @@
                 </label>
               </div>
             </div>
-
               {% if show.gym_info %}
             <div class="form-control switch-container" id="gym-sidebar-wrapper" style="display:none">
               <h3>Oldalsó Gym Panel</h3>
@@ -225,8 +229,7 @@
               {% endif %}
           </div>
 
-
-          <h3>Hely &amp; Keresési Beállítások</h3>
+          <h3><i class="fa fa-location-arrow fa-fw"></i>Hely &amp; Keresési Beállítások</h3>
 
           <div>
               {% if show.fixed_display %}
@@ -308,11 +311,9 @@
               {% endif %}
           </div>
 
-
             {% if show.pokemons %}
 
-          <h3>Értesítési beállítások</h3>
-
+          <h3><i class="fa fa-bullhorn fa-fw"></i>Értesítési beállítások</h3>
           <div>
             <div class="form-control">
               <label for="notify-pokemon">
@@ -348,8 +349,9 @@
                   <span class="switch-handle"></span>
                 </label>
               </div><br><br>
-              <div id="pokemoncries" style="display:none">
+              <div id="pokemoncries" style="display:none" class="form-control switch-container">
               <h3>Pokémon üvöltések</h3>
+
                 <div class="onoffswitch">
                 <input id="cries-switch" type="checkbox" name="cries-switch" class="onoffswitch-checkbox" checked>
                   <label class="onoffswitch-label" for="cries-switch">
@@ -358,13 +360,11 @@
                   </label>
                 </div>
               </div>
-             </div>
           </div>
 
             {% endif %}
 
-
-          <h3>Stílus Beállítások</h3>
+          <h3><i class="fa fa-map-o fa-fw"></i>Stílus Beállítások</h3>
 
           <div>
             <div class="form-control switch-container">
@@ -407,6 +407,9 @@
 			  <a target="_blank" href="http://www.facebook.com/pokemonbudapest">http://www.facebook.com/pokemonbudapest</a>
 		  </div>
         </div>
+      <div>
+        <center><button class="settings" onclick="confirm('Are you sure you want to reset settings to default values?') ? (localStorage.clear(), window.location.reload()) : false"><i class="fa fa-refresh fa-fw"></i>Reset Settings</button></center>
+      </div>
       </nav>
       <nav id="stats">
         <div class="switch-container">
@@ -459,6 +462,7 @@
     <script>
       var centerLat = {{lat}};
       var centerLng = {{lng}};
+      var showConfig = {{show|tojson|safe}};	  
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="{{ url_for('static', filename='dist/js/map.common.min.js').lstrip('/') }}"></script>
