@@ -650,16 +650,16 @@ function formatSpawnTime(seconds) {
 function spawnpointLabel(item) {
     var str = `
         <div>
-            <b>Spawn Point</b>
+            <b>Megjelenési Pont</b>
         </div>
         <div>
-            Every hour from ${formatSpawnTime(item.time)} to ${formatSpawnTime(item.time + 900)}
+            Minden órában ${formatSpawnTime(item.time)}-tól ${formatSpawnTime(item.time + 900)}-ig
         </div>`
 
     if (item.special) {
         str += `
             <div>
-                May appear as early as ${formatSpawnTime(item.time - 1800)}
+                Akár megjelenet ${formatSpawnTime(item.time - 1800)}-tól
             </div>`
     }
     return str
