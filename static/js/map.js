@@ -659,7 +659,7 @@ function spawnpointLabel(item) {
     if (item.special) {
         str += `
             <div>
-                Akár megjelenet ${formatSpawnTime(item.time - 1800)}-tól
+                Akár megjelenhet ${formatSpawnTime(item.time - 1800)}-tól
             </div>`
     }
     return str
