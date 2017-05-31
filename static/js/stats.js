@@ -67,7 +67,7 @@ function countMarkers(map) { // eslint-disable-line no-unused-vars
             .clear()
             .draw()
 
-        document.getElementById('pokeStatStatus').innerHTML = 'Pokémon markers are disabled'
+        document.getElementById('pokeStatStatus').innerHTML = 'A Pokémon jelölők ki vannak kapcsolva'
         $('#pokemonList_table').dataTable().hide()
     }       // end Pokémon processing
 
@@ -87,7 +87,7 @@ function countMarkers(map) { // eslint-disable-line no-unused-vars
             }
         })
 
-        var arenaListString = '<table><th>Ikon</th><th>Szín</th><th>db</th><th>%</th><tr><td></td><td>Total</td><td>' + arenaTotal + '</td></tr>'
+        var arenaListString = '<table><th>Ikon</th><th>Szín</th><th>db</th><th>%</th><tr><td></td><td>Összesen</td><td>' + arenaTotal + '</td></tr>'
         for (i = 0; i < arenaCount.length; i++) {
             if (arenaCount[i] > 0) {
                 if (i === 1) {

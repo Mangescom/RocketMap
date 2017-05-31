@@ -463,25 +463,20 @@ function pokemonLabel(item) {
             </div>
             `
     }
-    if (gender !== null) {
-        details += `
-            <div>
 
-                Nem: ${genderType[gender - 1]}
-            `
         if (weight !== null && height !== null) {
-            details += `| Súly: ${weight.toFixed(2)}kg | Magasság: ${height.toFixed(2)}m`
+            details += `<div>Súly: ${weight.toFixed(2)}kg | Magasság: ${height.toFixed(2)}m</div>`
         }
-        details += `
-                </div>
-                `
-    }
+
     var contentstring = `
         <div>
             <b>${name}</b>`
     if (id === 201 && form !== null && form > 0) {
         contentstring += ` (${unownForm[item['form']]})`
     }
+	 if (gender !== null) {
+        contentstring += ` ${genderType[gender - 1]}`
+	}
     contentstring += `<span> - </span>
             <small>
                 <a href='http://www.pokemon.com/us/pokedex/${id}' target='_blank' title='Pokédex Megnyitása'>#${id}</a>
@@ -1213,9 +1208,12 @@ function checkToken() {
 				console.log('valid token')
 
 				if (profile.roles.indexOf('trial') != -1) {
-					document.getElementById('info-msg').innerHTML = 'Próbaidőszak ' + year + '.' + month + '.' + day + ' - ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2) + '-ig'
+					document.getElementById('info-msg').innerHTML = 'Próbaidőszak lejárta'
+					document.getElementById('info-msg2').innerHTML = year + '.' + month + '.' + day + ' ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2)
+					
 					} else {
-					document.getElementById('info-msg').innerHTML = 'Előfizetés ' + year + '.' + month + '.' + day + ' - ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2) + '-ig'
+					document.getElementById('info-msg').innerHTML = 'Előfizetés lejárta'
+					document.getElementById('info-msg2').innerHTML = year + '.' + month + '.' + day + ' ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2) 
 					}
 				
 				

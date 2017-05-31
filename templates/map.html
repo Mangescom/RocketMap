@@ -56,18 +56,17 @@
       <!-- Header -->
       <header id="header">
         <a href="#nav"><span class="label">Beállítások</span></a>
-        <h1><a href="./">Pokémon Budapest<i class="fa fa-rocket fa-fw"></i></a></h1>
-
+        <h1><a href="./">Pokémon Budapest</a></h1>
         <button type="submit" id="btn-login" style="display:inline;margin-left:10px;">Bejelentkezés</button>
         <img alt="avatar" id="avatar" style="display:none;margin:auto;" >
         <button type="submit" id="btn-logout" style="display:none;margin-left:10px;">Kijelentkezés</button>
         <a href="#stats" id="statsToggle" class="statsNav" style="float: right;"><span class="label"> </span></a>
-        <a href="status" target="_blank" style="float: right;"><span class="label"> </span></a>
+        <!--<a href="status" target="_blank" style="float: right;"><span class="label"> </span></a>-->
       </header>
       <!-- NAV -->
       <nav id="nav">
         <div id="nav-accordion">
-          <h3><i class="fa fa-map-marker fa-fw"></i>Jelölő beállítások</h3>
+          <h3><i class="fa fa-map-marker fa-fw"></i>Jelölők</h3>
           <div>
               {% if show.pokemons %}
             <div class="form-control switch-container">
@@ -229,18 +228,19 @@
               {% endif %}
           </div>
 
-          <h3><i class="fa fa-location-arrow fa-fw"></i>Hely &amp; Keresési Beállítások</h3>
+          <h3><i class="fa fa-location-arrow fa-fw"></i>Helyzet</h3>
 
           <div>
               {% if show.fixed_display %}
             <div class="form-control switch-container">
               <label for="next-location">
               <h3>Helyzet</h3>
-              <input id="next-location" type="text" name="next-location" placeholder="Change search location">
+              <input id="next-location" type="text" name="next-location" placeholder="Cím megadása">
               </label>
             </div>
+			<!--
             <div class="form-control switch-container">
-              <h3>Lock search marker</h3>
+              <h3>Keresési Jelölő Zárolása</h3>
               <div class="onoffswitch">
                 <input id="lock-marker-switch" type="checkbox" name="lock-marker-switch" class="onoffswitch-checkbox" checked/>
                 <label class="onoffswitch-label" for="lock-marker-switch">
@@ -250,7 +250,7 @@
               </div>
             </div>
             <div class="form-control switch-container">
-              <h3>Search follows me</h3>
+              <h3>A Keresés Követ</h3>
               <div class="onoffswitch">
                 <input id="geoloc-switch" type="checkbox" name="geoloc-switch" class="onoffswitch-checkbox" checked/>
                 <label class="onoffswitch-label" for="geoloc-switch">
@@ -259,6 +259,7 @@
                 </label>
               </div>
             </div>
+			-->
               {% endif %}
             <div class="form-control switch-container" >
 
@@ -299,7 +300,7 @@
             </div>
               {% if show.scan_display %}
             <div class="form-control switch-container">
-              <h3>Scan here button</h3>
+              <h3>Itt Keressen Gomb</h3>
               <div class="onoffswitch">
                 <input id="scan-here-switch" type="checkbox" name="scan-here-switch" class="onoffswitch-checkbox" checked/>
                 <label class="onoffswitch-label" for="scan-here-switch">
@@ -313,7 +314,7 @@
 
             {% if show.pokemons %}
 
-          <h3><i class="fa fa-bullhorn fa-fw"></i>Értesítési beállítások</h3>
+          <h3><i class="fa fa-bullhorn fa-fw"></i>Értesítések</h3>
           <div>
             <div class="form-control">
               <label for="notify-pokemon">
@@ -336,7 +337,7 @@
             <div class="form-control">
               <label for="notify-perfection">
                 <h3>Értesítés Tökéletesség Szerint</h3>
-                <input id="notify-perfection" type="text" name="notify-perfection" placeholder="Minimum perfection %"/>
+                <input id="notify-perfection" type="text" name="notify-perfection" placeholder="Minimum tökéletességi %"/>
               </label>
             </div>
               {% endif %}
@@ -361,10 +362,11 @@
                 </div>
               </div>
           </div>
+          </div>
 
             {% endif %}
 
-          <h3><i class="fa fa-map-o fa-fw"></i>Stílus Beállítások</h3>
+          <h3><i class="fa fa-map-o fa-fw"></i>Stílus</h3>
 
           <div>
             <div class="form-control switch-container">
@@ -401,21 +403,32 @@
             </div>
 			
           </div>
-		  <h3 id="info-msg"></h3>
+		  <h3><i class="fa fa-credit-card fa-fw"></i>Előfizetés</h3>
 		  <div>
-			  <h3>Információ</h3>
-			  <a target="_blank" href="http://www.facebook.com/pokemonbudapest">http://www.facebook.com/pokemonbudapest</a>
+            <div class="form-control">
+				<h3 id="info-msg"  style="margin-bottom:0px"></h3>
+		  
+				<div id="info-msg2" ></div>
+			</div>
+            <div class="form-control" style="margin-bottom:0px">
+				<h3  style="margin-bottom:0px">Információ</h3>
+				<div>
+					<a target="_blank" href="http://www.facebook.com/pokemonbudapest">http://www.facebook.com/pokemonbudapest</a>
+				</div>
+			</div>
 		  </div>
         </div>
       <div>
-        <center><button class="settings" onclick="confirm('Are you sure you want to reset settings to default values?') ? (localStorage.clear(), window.location.reload()) : false"><i class="fa fa-refresh fa-fw"></i>Reset Settings</button></center>
+        <center><button class="settings" onclick="confirm('Biztos hogy vissza akarokod állítni a beállításokat az alapértelmezett értékekre?') ? (localStorage.clear(), window.location.reload()) : false"><i class="fa fa-refresh fa-fw"></i>Beállítások Visszaállítása</button></center>
       </div>
       </nav>
       <nav id="stats">
         <div class="switch-container">
+		<!--
           <div class="switch-container">
             <div><center><a href="stats">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></center></div>
           </div>
+		  -->
           <div class="switch-container">
             <center><h1 id="stats-ldg-label">Töltés...</h1></center>
           </div>
