@@ -869,7 +869,8 @@ function setupGymMarker(item) {
                 gymSidebar.classList.remove('visible')
             } else {
                 gymSidebar.setAttribute('data-id', item['gym_id'])
-                showGymDetails(item['gym_id'])
+                showGymDetails(item['gym_id']);
+				hook(hookToGymDetails);
             }
         })
 
@@ -1880,6 +1881,308 @@ function createUpdateWorker() {
     }
 }
 
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+	var MONTHS = ['Jan', 'Feb', 'Már', 'Ápr', 'Máj', 'Jún', 'Júl', 'Aug', 'Sze', 'Okt', 'Nov', 'Dec'];
+    var TEAMS = { "1": "Mystic", "2": "Valor", "3": "Instinct" };
+    var TEAM_LOGO_PATH = 'static/forts/{team}_large.png';
+    var _gymDetails = void 0;
+
+    var createElement = function createElement(tagName, classList, content) {
+        var element = document.createElement(tagName);
+        // Classes
+        if (typeof classList === "string") classList = classList.split(' ');
+        if ((typeof classList === 'undefined' ? 'undefined' : _typeof(classList)) === "object" && classList instanceof Array) {
+            classList.forEach(function (className) {
+                if (className.length > 0) element.classList.add(className);
+            });
+        }
+        // ChildElements
+        if (typeof content !== "undefined") {
+            if ((typeof content === 'undefined' ? 'undefined' : _typeof(content)) !== "object" || !(content instanceof Array)) {
+                content = [content];
+            }
+            content.forEach(function (child) {
+                if (typeof child === "string") child = document.createTextNode(child);
+                if ((typeof child === 'undefined' ? 'undefined' : _typeof(child)) === "object" && child instanceof Node) element.appendChild(child);
+            });
+        }
+        return element;
+    };
+
+    var fetchGymHistory = function fetchGymHistory(gym_id) {
+        return new Promise(function (pass, fail) {
+            fetch('http://127.0.0.1:1234/RocketMapExtras/GymData/gymchanges.php?gymid=' + encodeURIComponent(gym_id)).then(function (response) {
+                return response.json();
+            }).then(function (responseObj) {
+                if (responseObj.success) pass(responseObj.data);else fail(responseObj.message);
+            });
+        });
+    };
+
+    var fetchTrainerGyms = function fetchTrainerGyms(trainer_name) {
+        return new Promise(function (pass, fail) {
+            fetch('http://127.0.0.1:1234/RocketMapExtras/GymData/trainer_gympokemon.php?trainer_name=' + encodeURIComponent(trainer_name)).then(function (response) {
+                return response.json();
+            }).then(function (responseObj) {
+                if (responseObj.success) pass(responseObj.data);else fail(responseObj.message);
+            });
+        });
+    };
+
+    var fetchTrainerHistory = function fetchTrainerHistory(trainer_name) {
+        return new Promise(function (pass, fail) {
+            fetch('http://127.0.0.1:1234/RocketMapExtras/GymData/trainer_gymhistory.php?trainer_name=' + encodeURIComponent(trainer_name)).then(function (response) {
+                return response.json();
+            }).then(function (responseObj) {
+                if (responseObj.success) pass(responseObj.data);else fail(responseObj.message);
+            });
+        });
+    };
+
+    var getDateString = function getDateString(date) {
+        return MONTHS[date.getMonth()] + ' ' + date.getDate();
+    };
+
+    var getTimeString = function getTimeString(date) {
+        var minutes = '' + date.getMinutes();
+        while (minutes.length < 2) {
+            minutes = '0' + minutes;
+        }
+        return date.getHours() + ':' + minutes;
+    };
+
+    var formatPrestige = function formatPrestige(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    var addGymHistory = function addGymHistory(history) {
+		
+        history.sort(function (a, b) {
+            if (a.timestamp !== b.timestamp) return b.timestamp - a.timestamp;
+            if (b.event === "added") return 1;
+            return -1;
+        });
+
+        var historyContainer = createElement('div', 'gym-history', [createElement('h3', null, 'Történelem'), createElement('div', 'gym-history-records', history.map(function (record) {
+            // Prepare some data / elements
+            var date = new Date(parseInt(record.timestamp) * 1000);
+            var teamName = TEAMS[record.trainer_team];
+            var pokemonName = idToPokemon[record.pokemon_id].name;
+            var trainerNameElement = createElement('span', null, record.trainer_name);
+            //trainerNameElement.addEventListener('click', trainerNameClick);
+
+            // gym-history-record
+            return createElement('div', ['gym-history-record', 'pokemon-' + record.event, 'team-' + teamName.toLowerCase()], [
+            // Icon
+            createElement('div', 'gym-history-record-icon', [createElement('i', ['pokemon-sprite', 'n' + record.pokemon_id])]),
+            // Text
+            createElement('div', 'gym-history-record-text', [createElement('h4', null, pokemonName + ' (' + record.cp + ') ' + [record.event == 'added' ? 'berakva' : 'kiverve']), createElement('p', null, ['Trainer: ', trainerNameElement])]),
+            // When
+            createElement('div', 'gym-history-record-when', [createElement('date', null, getDateString(date)), createElement('time', null, getTimeString(date))])]);
+        }))]);
+        _gymDetails.appendChild(historyContainer);
+    };
+
+    var watchGymDetailsHTML = function watchGymDetailsHTML() {
+        return new Promise(function (pass, fail) {
+            var initialHTML = _gymDetails.innerHTML;
+            var interval = setInterval(function () {
+                var html = _gymDetails.innerHTML;
+                if (html != initialHTML) {
+                    clearInterval(interval);
+                    pass();
+                }
+            }, 25);
+        });
+    };
+
+    var locateGym = function locateGym(lat, lng) {
+        var targetLatLng = new google.maps.LatLng(lat, lng);
+        searchMarker.setPosition(targetLatLng);
+        map.setCenter(targetLatLng);
+    };
+
+    var setGymDetailsLoading = function setGymDetailsLoading() {
+        clearGymDetails();
+
+        var _loadingElement = createElement('center', null, [createElement('h3', null, 'Loading...')]);
+
+        _gymDetails.appendChild(_loadingElement);
+    };
+
+    var clearGymDetails = function clearGymDetails() {
+        // First get a reference to the close button and remove it
+        var _close = _gymDetails.querySelector('.close');
+        _close.remove();
+
+        // Then remove everything else
+        _gymDetails.innerHTML = '';
+
+        // Then put the close button back in place
+        _gymDetails.appendChild(_close);
+
+        // Scroll to top
+        _gymDetails.scrollTop = 0;
+    };
+
+    var showTrainerInfo = function showTrainerInfo(args) {
+        var _args = _slicedToArray(args, 2),
+            trainerGymPokemon = _args[0],
+            trainerGymHistory = _args[1];
+
+        // Clear the panels contents except for the closing button
+
+        clearGymDetails();
+
+        // Sort history
+        trainerGymHistory.history.sort(function (a, b) {
+            if (a.timestamp !== b.timestamp) return b.timestamp - a.timestamp;
+            if (b.event === "added") return 1;
+            return -1;
+        });
+
+        // Generic trainer info for header
+        var trainerName = trainerGymPokemon.trainer.name;
+        var trainerLevel = trainerGymPokemon.trainer.level;
+        var team = TEAMS[trainerGymPokemon.trainer.team];
+        var logoPath = TEAM_LOGO_PATH.replace('{team}', team);
+        var logoElement = createElement('img', 'trainer-info-general-teamLogo');
+        logoElement.setAttribute('src', logoPath);
+
+        var trainerInfo = createElement('div', 'trainer-info', [createElement('div', 'trainer-info-general', [createElement('h2', 'trainer-info-general-trainerName', trainerName), logoElement, createElement('p', 'trainer-info-general-level', 'Level ' + trainerLevel)]), createElement('div', 'trainer-info-gym-pokemon', [createElement('h3', 'trainer-info-gym-pokemon-title', 'Gyms')].concat(_toConsumableArray(trainerGymPokemon.pokemon.map(function (pokemon) {
+            // trainer_gympokemon
+            // prepare variables we need
+            var gymName = pokemon.gym_name;
+            var gymPoints = parseInt(pokemon.gym_points);
+            var gymLevel = getGymLevel(gymPoints);
+            var gymLatitude = parseFloat(pokemon.latitude);
+            var gymLongitude = parseFloat(pokemon.longitude);
+
+            var pokemonId = pokemon.pokemon_id;
+            var pokemonName = idToPokemon[pokemonId].name;
+            var pokemonCP = pokemon.cp;
+
+            var locateGymButton = createElement('button', 'trainer-info-gym-pokemon-record-locate-button');
+            locateGymButton.addEventListener('click', function () {
+                locateGym(gymLatitude, gymLongitude);
+            });
+
+            var gymNameElement = createElement('h4', 'trainer-info-gym-pokemon-record-gym-name', gymName);
+            gymNameElement.addEventListener('click', gymNameClick);
+            gymNameElement.dataset.gymId = pokemon.gym_id;
+
+            return createElement('div', 'trainer-info-gym-pokemon-record', [
+            // icon	[POKEMON]	[Level][GYM]	Locate	
+            // icon				            	Locate
+            // icon	[cp]		Prestige	    Locate
+            createElement('div', 'trainer-info-gym-pokemon-record-icon', [createElement('i', ['pokemon-sprite', 'n' + pokemonId])]),
+            // Text
+            createElement('div', 'trainer-info-gym-pokemon-record-pokemon', [createElement('h4', null, '' + pokemonName), createElement('p', null, pokemonCP + 'cp')]), createElement('div', 'trainer-info-gym-pokemon-record-gym', [createElement('div', 'trainer-info-gym-pokemon-record-gym-container', [gymNameElement, createElement('p', null, 'Lvl ' + gymLevel + ', ' + formatPrestige(gymPoints) + ' prestige')])]),
+            // Locate
+            createElement('div', 'trainer-info-gym-pokemon-record-locate', [locateGymButton])]);
+        })))), createElement('div', 'trainer-info-gym-history', [createElement('h3', 'trainer-info-gym-history-title', 'History')].concat(_toConsumableArray(trainerGymHistory.history.map(function (record) {
+            // trainer_gymhistory
+            // prepare variables we need
+            var gymName = record.gym_name;
+            var gymPoints = parseInt(record.gym_points);
+            var gymLevel = getGymLevel(gymPoints);
+            var gymLatitude = parseFloat(record.latitude);
+            var gymLongitude = parseFloat(record.longitude);
+
+            var pokemonId = record.pokemon_id;
+            var pokemonName = idToPokemon[pokemonId].name;
+            var pokemonCP = record.cp;
+
+            var event = record.event;
+
+            var date = new Date(parseInt(record.timestamp) * 1000);
+            var dateString = getDateString(date);
+            var timeString = getTimeString(date);
+
+            var gymNameElement = createElement('span', 'trainer-info-gym-history-record-text-gymname', gymName);
+            gymNameElement.addEventListener('click', gymNameClick);
+            gymNameElement.dataset.gymId = record.gym_id;
+
+            return createElement('div', ['trainer-info-gym-history-record', 'pokemon-' + event], [createElement('div', 'trainer-info-gym-history-record-icon', [createElement('i', ['pokemon-sprite', 'n' + pokemonId])]),
+            // Text
+            createElement('div', 'trainer-info-gym-history-record-text', [createElement('h4', null, pokemonName + ' (' + record.cp + ')'), createElement('p', null, [record.event == 'added' ? 'Berakva: ' : 'Kiverve: ', gymNameElement])]),
+            // When
+            createElement('div', 'trainer-info-gym-history-record-when', [createElement('date', null, getDateString(date)), createElement('time', null, getTimeString(date))])]);
+        }))))]);
+
+        _gymDetails.appendChild(trainerInfo);
+
+        console.log({ trainerGymPokemon: trainerGymPokemon, trainerGymHistory: trainerGymHistory });
+    };
+
+    var trainerNameClick = function trainerNameClick(e) {
+        e.stopPropagation();
+
+        var trainer_name = this.innerText.trim();
+        var trainerGymsPromise = fetchTrainerGyms(trainer_name);
+        var trainerHistoryPromise = fetchTrainerHistory(trainer_name);
+
+        _gymDetails.setAttribute('data-id', '');
+        setGymDetailsLoading();
+        Promise.all([trainerGymsPromise, trainerHistoryPromise]).then(showTrainerInfo);
+    };
+
+    var gymNameClick = function gymNameClick(e) {
+        e.stopPropagation();
+
+        var gym_name = this.innerText.trim();
+        var gym_id = this.dataset.gymId;
+        setGymDetailsLoading();
+        _gymDetails.setAttribute('data-id', gym_id);
+        _gymDetails.dataset.id = gym_id;
+    };
+
+    var bindTrainerNames = function bindTrainerNames() {
+          var trainer_names = _gymDetails.querySelectorAll('.trainer-level + div[style]');
+          trainer_names.forEach(function (trainer_name) {
+            trainer_name.addEventListener('click', trainerNameClick);
+        });
+    };
+
+    var hookToGymDetails = function hookToGymDetails(gym_id) {
+        var fetchPromise = fetchGymHistory(gym_id);
+        var htmlPromise = watchGymDetailsHTML();
+        Promise.all([fetchPromise, htmlPromise]).then(function (results) {
+            var gymHistory = results[0];
+			var elems = _gymDetails.getElementsByClassName("gym-history");
+			for (var k = elems.length - 1; k >= 0; k--) {
+				_gymDetails.removeChild(elems[k]);
+			};
+			
+           // bindTrainerNames();
+            addGymHistory(gymHistory);
+        });
+    };
+
+    var hook = function hook(callback) {
+        // select the target node
+        _gymDetails = document.querySelector('#gym-details');
+
+        // create an observer instance
+        var observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                if (mutation.attributeName != "data-id") return;
+
+                var id = _gymDetails.getAttribute('data-id');
+                if (id != '') callback(id);
+            });
+        });
+
+        // configuration of the observer:
+        var config = { attributes: true, childList: false, characterData: false };
+
+        // pass in the target node, as well as the observer options
+        observer.observe(_gymDetails, config);
+    };
+
 function showGymDetails(id) { // eslint-disable-line no-unused-vars
     var sidebar = document.querySelector('#gym-details')
     var sidebarClose
@@ -2062,6 +2365,7 @@ function showGymDetails(id) { // eslint-disable-line no-unused-vars
             sidebar.classList.remove('visible')
         })
     })
+	
 }
 
 function toggleGymPokemonDetails(e) { // eslint-disable-line no-unused-vars
