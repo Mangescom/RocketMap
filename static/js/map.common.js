@@ -935,7 +935,7 @@ var StoreOptions = {
         type: StoreTypes.Boolean
     },
     'startAtUserLocation': {
-        default: true,
+        default: false,
         type: StoreTypes.Boolean
     },
     'followMyLocation': {

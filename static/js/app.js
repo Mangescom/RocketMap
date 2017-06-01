@@ -202,9 +202,12 @@
 				console.log('save token')
 				localStorage.setItem('id_token', authResult.idToken);
 				if (profile.roles.indexOf('trial') != -1) {
-					document.getElementById('info-msg').innerHTML = 'Próbaidőszak ' + year + '.' + month + '.' + day + ' - ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2) + '-ig'
-				} else {
-					document.getElementById('info-msg').innerHTML = 'Előfizetés ' + year + '.' + month + '.' + day + ' - ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2) + '-ig'
+					document.getElementById('info-msg').innerHTML = 'Próbaidőszak lejárta'
+					document.getElementById('info-msg2').innerHTML = year + '.' + month + '.' + day + ' ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2)
+					
+					} else {
+					document.getElementById('info-msg').innerHTML = 'Előfizetés lejárta'
+					document.getElementById('info-msg2').innerHTML = year + '.' + month + '.' + day + ' ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2) 
 					}
 				
 				var avatar = document.getElementById('avatar');
