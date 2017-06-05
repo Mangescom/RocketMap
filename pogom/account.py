@@ -285,6 +285,24 @@ def get_player_level(map_dict):
     return 0
 
 
+def get_inventory_items(map_dict):
+    inventory_items_response = map_dict['responses'][
+        'GET_INVENTORY']['inventory_delta']['inventory_items']
+    log.debug(
+        'Inventory items response: \n\r{}'.format(inventory_items_response))
+
+    inventory_items = []
+    if len(inventory_items_response) > 0:
+        inventory_items = ([item['inventory_item_data']['item']
+                           for item in inventory_items_response
+                           if 'item' in item.get('inventory_item_data', {})])
+
+        if len(inventory_items) > 0:
+            return inventory_items
+
+    return False
+
+
 def spin_pokestop(api, fort, step_location):
     spinning_radius = 0.04
     if in_radius((fort['latitude'], fort['longitude']), step_location,
