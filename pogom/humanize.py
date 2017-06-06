@@ -47,10 +47,10 @@ def pokestop_spinnable(fort, step_location):
 
 
 # 50% Chance to spin a Pokestop.
-def spinning_try(api, fort, step_location, account):
+def spinning_try(api, fort, step_location, account, map_dict):
     # Set 50% Chance to spin a Pokestop.
     if random.randint(0, 100) < 50:
-        time.sleep(random.uniform(0.8, 1.8))  # Do not let Niantic throttle.
+        time.sleep(random.uniform(2, 4))  # Do not let Niantic throttle.
         spin_response = spin_pokestop_request(api, fort, step_location)
         if not spin_response:
             return False
@@ -65,7 +65,6 @@ def spinning_try(api, fort, step_location, account):
         # Catch all possible responses.
         spin_result = spin_response['responses']['FORT_SEARCH']['result']
         if spin_result is 1:
-            time.sleep(random.uniform(2, 4))  # Do not let Niantic throttle.
             items_recieved = spin_response['responses']['FORT_SEARCH'][
                 'items_awarded']
             log.info('Successful Pokestop spin with %s.', account['username'])
@@ -82,6 +81,8 @@ def spinning_try(api, fort, step_location, account):
         elif spin_result is 4:
             log.info('Failed to spin Pokestop %s. %s Inventory is full.',
                      fort['id'], account['username'])
+            log.info('Clearing Inventory...')
+            clear_inventory(api, account, map_dict)
         elif spin_result is 5:
             log.info('Account %s has spun maximum Pokestops for today.',
                      account['username'])
@@ -103,8 +104,9 @@ def clear_inventory(api, account, map_dict):
             items_to_drop = total_items - 5
             if item_id in ITEMS:
                 item_name = ITEMS[item_id]
+            if total_items > random.randint(5, 10):
                 # Do not let Niantic throttle
-                time.sleep(random.uniform(1.75, 2.75))
+                time.sleep(random.uniform(2, 4))
                 clear_inventory_response = clear_inventory_request(
                     api, item_id, items_to_drop)
 

@@ -11,6 +11,7 @@ import time
 import geopy
 import cluster
 import math
+import random
 from peewee import (InsertQuery, Check, CompositeKey, ForeignKeyField,
                     SmallIntegerField, IntegerField, CharField, DoubleField,
                     BooleanField, DateTimeField, fn, DeleteQuery, FloatField,
@@ -2280,8 +2281,7 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
                      datetime(1970, 1, 1)).total_seconds())) for f in query]
 
         # Complete tutorial with a Pokestop spin
-        if (args.complete_tutorial and not (len(captcha_url) > 1) and not
-                args.pokestop_spinning):
+        if (args.complete_tutorial and not args.pokestop_spinning):
             if config['parse_pokestops']:
                 tutorial_pokestop_spin(
                     api, level, forts, step_location, account)
@@ -2335,8 +2335,10 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
                 # Spin Pokestop with 50% chance.
                 if args.pokestop_spinning and pokestop_spinnable(
                         f, step_location):
-                    spinning_try(api, f, step_location, account)
-                    clear_inventory(api, account, map_dict)
+                    spinning_try(api, f, step_location, account, map_dict)
+                    chance = random.randint(0, 100)
+                    if chance <= 20:
+                        clear_inventory(api, account, map_dict)
 
                 if ((f['id'], int(f['last_modified_timestamp_ms'] / 1000.0))
                         in encountered_pokestops):
