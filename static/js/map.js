@@ -1914,7 +1914,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
     var fetchGymHistory = function fetchGymHistory(gym_id) {
         return new Promise(function (pass, fail) {
-            fetch('http://127.0.0.1:1234/RocketMapExtras/GymData/gymchanges.php?gymid=' + encodeURIComponent(gym_id)).then(function (response) {
+            fetch('http://pokemonbudapest.ddns.net:1234/RocketMapExtras/GymData/gymchanges.php?gymid=' + encodeURIComponent(gym_id)).then(function (response) {
                 return response.json();
             }).then(function (responseObj) {
                 if (responseObj.success) pass(responseObj.data);else fail(responseObj.message);
@@ -1924,7 +1924,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
     var fetchTrainerGyms = function fetchTrainerGyms(trainer_name) {
         return new Promise(function (pass, fail) {
-            fetch('http://127.0.0.1:1234/RocketMapExtras/GymData/trainer_gympokemon.php?trainer_name=' + encodeURIComponent(trainer_name)).then(function (response) {
+            fetch('http://pokemonbudapest.ddns.net:1234/RocketMapExtras/GymData/trainer_gympokemon.php?trainer_name=' + encodeURIComponent(trainer_name)).then(function (response) {
                 return response.json();
             }).then(function (responseObj) {
                 if (responseObj.success) pass(responseObj.data);else fail(responseObj.message);
@@ -1934,7 +1934,7 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
     var fetchTrainerHistory = function fetchTrainerHistory(trainer_name) {
         return new Promise(function (pass, fail) {
-            fetch('http://127.0.0.1:1234/RocketMapExtras/GymData/trainer_gymhistory.php?trainer_name=' + encodeURIComponent(trainer_name)).then(function (response) {
+            fetch('http://pokemonbudapest.ddns.net:1234/RocketMapExtras/GymData/trainer_gymhistory.php?trainer_name=' + encodeURIComponent(trainer_name)).then(function (response) {
                 return response.json();
             }).then(function (responseObj) {
                 if (responseObj.success) pass(responseObj.data);else fail(responseObj.message);
