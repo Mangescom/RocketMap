@@ -528,7 +528,7 @@ function gymLabel(teamName, teamId, gymPoints, latitude, longitude, lastScanned 
     var directionsStr = ''
     if (!Store.get('useGymSidebar')) {
         directionsStr = `<div>
-                <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Google Maps Megnyitása'>Get directions</a>
+                <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Google Maps Megnyitása'>Útvonalterv</a>
             </div>`
     }
 
@@ -571,10 +571,10 @@ function gymLabel(teamName, teamId, gymPoints, latitude, longitude, lastScanned 
         str += `
                     <br>
                     <div>
-                        Raid Szint: ${levelStr}
-                    </div>
-                    <div>
-                        <div style="margin-bottom: 10px">Idő: <b>${raidStartStr}</b> - <b>${raidEndsStr}</b></div>
+                        Raid: ${levelStr}
+					</div>
+					<div>
+						Időpont: <b>${raidStartStr}</b> - <b>${raidEndsStr}</b>
                     </div>`
         if (raid['pokemon_id'] !== null) {
             var types = raid['pokemon_types']
@@ -586,7 +586,6 @@ function gymLabel(teamName, teamId, gymPoints, latitude, longitude, lastScanned 
                 typesDisplay += getTypeSpan(type)
             })
             str += `
-                    <br>
                     <div>
                         <b>${raid['pokemon_name']}</b>
                         <span> - </span>
@@ -597,13 +596,9 @@ function gymLabel(teamName, teamId, gymPoints, latitude, longitude, lastScanned 
                         <small>${typesDisplay}</small>
                     </div>
                     <div>
-                        CP: ${raid['cp']}
-                    </div>
-                    <div>
-                        Támadások: ${pMove1} / ${pMove2}
+                        CP: ${raid['cp']} - ${pMove1} / ${pMove2}
                     </div>`
         }
-        str += '<br>'
     }
 
     str += `
@@ -2285,9 +2280,9 @@ function showGymDetails(id) { // eslint-disable-line no-unused-vars
                     <center>
                         <div>
                             Raid: ${levelStr}
-                        </div>
-                        <div>
-                            <div style="margin-bottom: 10px">Time: <b>${raidStartStr}</b> - <b>${raidEndsStr}</b></div>
+						</div>
+						<div>
+							Időpont: <b>${raidStartStr}</b> - <b>${raidEndsStr}</b>
                         </div>`
             if (raid['pokemon_id'] !== null) {
                 var types = raid['pokemon_types']
@@ -2311,10 +2306,7 @@ function showGymDetails(id) { // eslint-disable-line no-unused-vars
                             <small>${typesDisplay}</small>
                         </div>
                         <div>
-                            CP: ${raid['cp']}
-                        </div>
-                        <div>
-                            Támadások: ${pMove1} / ${pMove2}
+                            CP: ${raid['cp']} - ${pMove1} / ${pMove2}
                         </div>`
             }
             headerHtml += '</center><br>'
