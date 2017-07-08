@@ -48,13 +48,11 @@ cache = TTLCache(maxsize=100, ttl=60 * 5)
 
 db_schema_version = 20
 
-
 class Shadowbanned(Exception):
     def __init__(self, account, missed_ids=[], final=False):
         self.account = account
         self.missed_ids = missed_ids
         self.final = final
-
 
 class MyRetryDB(RetryOperationalError, PooledMySQLDatabase):
     pass
@@ -692,8 +690,13 @@ class Gym(BaseModel):
                        .select(
                            GymMember.gym_id,
                            GymPokemon.cp.alias('pokemon_cp'),
+<<<<<<< HEAD
                            GymMember.cp_decayed.alias('pokemon_cp_decayed'),
                            GymMember.deployment_time.alias('deployment_time'),
+=======
+                           GymMember.cp_decayed,
+                           GymMember.deployment_time,
+>>>>>>> 287f9492e257f1ac74b3fc5e40a333785c14e3f1
                            GymPokemon.pokemon_id,
                            Trainer.name.alias('trainer_name'),
                            Trainer.level.alias('trainer_level'))
@@ -723,7 +726,10 @@ class Gym(BaseModel):
 
             raids = (Raid
                      .select()
+<<<<<<< HEAD
                      .join(Gym, on=(Raid.gym_id == Gym.gym_id))
+=======
+>>>>>>> 287f9492e257f1ac74b3fc5e40a333785c14e3f1
                      .where(Raid.gym_id << gym_ids)
                      .dicts())
 
@@ -740,6 +746,7 @@ class Gym(BaseModel):
 
     @staticmethod
     def get_gym(id):
+<<<<<<< HEAD
         result = (Gym
                   .select(Gym.gym_id,
                           Gym.team_id,
@@ -756,6 +763,28 @@ class Gym(BaseModel):
                   .where(Gym.gym_id == id)
                   .dicts()
                   .get())
+=======
+
+        try:
+            result = (Gym
+                      .select(Gym.gym_id,
+                              Gym.team_id,
+                              GymDetails.name,
+                              GymDetails.description,
+                              Gym.guard_pokemon_id,
+                              Gym.slots_available,
+                              Gym.latitude,
+                              Gym.longitude,
+                              Gym.last_modified,
+                              Gym.last_scanned)
+                      .join(GymDetails, JOIN.LEFT_OUTER,
+                            on=(Gym.gym_id == GymDetails.gym_id))
+                      .where(Gym.gym_id == id)
+                      .dicts()
+                      .get())
+        except Gym.DoesNotExist:
+            return None
+>>>>>>> 287f9492e257f1ac74b3fc5e40a333785c14e3f1
 
         result['guard_pokemon_name'] = get_pokemon_name(
             result['guard_pokemon_id']) if result['guard_pokemon_id'] else ''
@@ -763,7 +792,12 @@ class Gym(BaseModel):
 
         pokemon = (GymMember
                    .select(GymPokemon.cp.alias('pokemon_cp'),
+<<<<<<< HEAD
                            GymMember.cp_decayed.alias('pokemon_cp_decayed'),
+=======
+                           GymMember.cp_decayed,
+                           GymMember.deployment_time,
+>>>>>>> 287f9492e257f1ac74b3fc5e40a333785c14e3f1
                            GymPokemon.pokemon_id,
                            GymPokemon.pokemon_uid,
                            GymPokemon.move_1,
@@ -798,15 +832,25 @@ class Gym(BaseModel):
 
             result['pokemon'].append(p)
 
+<<<<<<< HEAD
         raids = (Raid.select().where(Raid.gym_id == id).dicts())
 
         # Really it should always be only one.
         if len(raids) > 0:
             raid = raids[0]
+=======
+        try:
+            raid = Raid.select(Raid).where(Raid.gym_id == id).dicts().get()
+>>>>>>> 287f9492e257f1ac74b3fc5e40a333785c14e3f1
             if raid['pokemon_id']:
                 raid['pokemon_name'] = get_pokemon_name(raid['pokemon_id'])
                 raid['pokemon_types'] = get_pokemon_types(raid['pokemon_id'])
             result['raid'] = raid
+<<<<<<< HEAD
+=======
+        except Raid.DoesNotExist:
+            pass
+>>>>>>> 287f9492e257f1ac74b3fc5e40a333785c14e3f1
 
         return result
 
@@ -2425,9 +2469,20 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
             elif config['parse_gyms'] and f.get('type') is None:
                 b64_gym_id = b64encode(str(f['id']))
                 gym_display = f.get('gym_display', {})
+<<<<<<< HEAD
 
+=======
+                raid_info = f.get('raid_info', {})
+>>>>>>> 287f9492e257f1ac74b3fc5e40a333785c14e3f1
                 # Send gyms to webhooks.
                 if args.webhooks and not args.webhook_updates_only:
+                    raid_active_until = 0
+                    raid_battle_ms = raid_info.get('raid_battle_ms', 0)
+                    raid_end_ms = raid_info.get('raid_end_ms', 0)
+
+                    if raid_battle_ms / 1000 > time.time():
+                        raid_active_until = raid_end_ms / 1000
+
                     # Explicitly set 'webhook_data', in case we want to change
                     # the information pushed to webhooks.  Similar to above
                     # and previous commits.
@@ -2450,10 +2505,21 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
                             f['longitude'],
                         'lowest_pokemon_motivation':
                             gym_display.get('lowest_pokemon_motivation', 0),
+<<<<<<< HEAD
                         'occupied_seconds':
                             gym_display.get('occupied_millis', 0) / 1000,
                         'last_modified':
                             f['last_modified_timestamp_ms']
+=======
+                        'occupied_since':
+                            calendar.timegm((datetime.utcnow() - timedelta(
+                                milliseconds=gym_display.get(
+                                    'occupied_millis', 0))).timetuple()),
+                        'last_modified':
+                            f['last_modified_timestamp_ms'],
+                        'raid_active_until':
+                            raid_active_until
+>>>>>>> 287f9492e257f1ac74b3fc5e40a333785c14e3f1
                     }))
 
                 gyms[f['id']] = {
@@ -2479,7 +2545,10 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
                 }
 
                 if config['parse_raids'] and f.get('type') is None:
+<<<<<<< HEAD
                     raid_info = f.get('raid_info', {})
+=======
+>>>>>>> 287f9492e257f1ac74b3fc5e40a333785c14e3f1
                     if raid_info:
                         raids[f['id']] = {
                             'gym_id': f['id'],
@@ -2698,6 +2767,7 @@ def parse_gyms(args, gym_responses, wh_update_queue, db_update_queue):
             }
 
             if args.webhooks:
+<<<<<<< HEAD
                 webhook_data['pokemon'].append({
                     'pokemon_uid':
                         pokemon['id'],
@@ -2733,9 +2803,19 @@ def parse_gyms(args, gym_responses, wh_update_queue, db_update_queue):
                         pokemon.get('individual_attack', 0),
                     'trainer_name':
                         member['trainer_public_profile']['name'],
+=======
+                wh_pokemon = gym_pokemon[i].copy()
+                del wh_pokemon['last_seen']
+                wh_pokemon.update({
+                    'cp_decayed':
+                        member['motivated_pokemon']['cp_now'],
+>>>>>>> 287f9492e257f1ac74b3fc5e40a333785c14e3f1
                     'trainer_level':
                         member['trainer_public_profile']['level'],
+                    'deployment_time': calendar.timegm(
+                        gym_members[i]['deployment_time'].timetuple())
                 })
+                webhook_data['pokemon'].append(wh_pokemon)
 
             i += 1
         if args.webhooks:
