@@ -1141,17 +1141,19 @@ def search_worker_thread(args, account_queue, account_sets,
                             # Make sure the gym was in range. (Sometimes the
                             # API gets cranky about gyms that are ALMOST 1km
                             # away.)
-                            if response['responses'][
-                                    'GYM_GET_INFO']['result'] == 2:
-                                log.warning(
-                                    ('Gym @ %f/%f is out of range (%dkm), ' +
-                                     'skipping.'),
-                                    gym['latitude'], gym['longitude'],
-                                    distance)
-                            else:
-                                gym_responses[gym['gym_id']] = response[
-                                    'responses']['GYM_GET_INFO']
-                            del response
+                            if response:
+                                if response['responses'][
+                                        'GYM_GET_INFO']['result'] == 2:
+                                    log.warning(
+                                        ('Gym @ %f/%f is out of range (%dkm),'
+                                         + ' skipping.'),
+                                        gym['latitude'], gym['longitude'],
+                                        distance)
+                                else:
+                                    gym_responses[gym['gym_id']] = response[
+                                        'responses']['GYM_GET_INFO']
+                                del response
+
                             # Increment which gym we're on for status messages.
                             current_gym += 1
 
@@ -1267,9 +1269,8 @@ def map_request(api, account, position, no_jitter=False):
         req.get_buddy_walked()
         req.get_inbox(is_history=True)
         response = req.call()
-
-        response = clear_dict_response(response, True)
         parse_new_timestamp_ms(account, response)
+        response = clear_dict_response(response)
         return response
 
     except HashingOfflineException as e:

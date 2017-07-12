@@ -671,16 +671,18 @@ function formatSpawnTime(seconds) {
 function spawnpointLabel(item) {
     var str = `
         <div>
-            <b>Megjelenési Pont</b>
-        </div>
-        <div>
-            Minden órában ${formatSpawnTime(item.time)}-tól ${formatSpawnTime(item.time + 900)}-ig
+            <b>Megejelnési Pont</b>
         </div>`
 
-    if (item.special) {
+    if (item.uncertain) {
         str += `
             <div>
-                Akár megjelenhet ${formatSpawnTime(item.time - 1800)}-tól
+                A megjelenési idő még nincs pontosan meghatározva. Jelenlegi tipp: ${formatSpawnTime(item.appear_time)}-tól ${formatSpawnTime(item.disappear_time)}-ig
+            </div>`
+    } else {
+        str += `
+            <div>
+                Minden órában ${formatSpawnTime(item.appear_time)}-tól ${formatSpawnTime(item.disappear_time)}-ig
             </div>`
     }
     return str
@@ -1594,7 +1596,7 @@ function processSpawnpoints(i, item) {
         return false
     }
 
-    var id = item['spawnpoint_id']
+    var id = item['id']
 
     if (!(id in mapData.spawnpoints)) { // add marker to map and item to dict
         if (item.marker) {
