@@ -1,42 +1,90 @@
 {
   "none": {
     "name": "Rejtett",
-    "icon": "static/marker_icons/transparent.png"
+    "icon": "static/images/markers/transparent.png"
+  },
+  "backpack": {
+    "name": "Hátizsák",
+    "icon": "static/images/markers/backpack.png"
+  },
+  "camera": {
+    "name": "Kamera",
+    "icon": "static/images/markers/camera.png"
+  },
+  "compass": {
+    "name": "Iránytű",
+    "icon": "static/images/markers/compass.png"
   },
   "google": {
     "name": "Alapértelmezett Google Jelölő",
     "icon": null
   },
-  "red": {
-    "name": "Piros",
-    "icon": "static/marker_icons/red.gif"
+  "female": {
+    "name": "Nő",
+    "icon": "static/images/markers/female.png"
   },
-  "red_animated": {
-    "name": "Piros (Animált)",
-    "icon": "static/marker_icons/red_animated.gif"
+  "male": {
+    "name": "Férfi",
+    "icon": "static/images/markers/male.png"
   },
-  "blue": {
-    "name": "Kék",
-    "icon": "static/marker_icons/blue.gif"
-  },
-  "blue_animated": {
-    "name": "Kék (Animált)",
-    "icon": "static/marker_icons/blue_animated.gif"
-  },
-  "yellow": {
-    "name": "Sárga",
-    "icon": "static/marker_icons/yellow.gif"
-  },
-  "yellow_animated": {
-    "name": "Sárga (Animált)",
-    "icon": "static/marker_icons/yellow_animated.gif"
-  },
-  "pokesition": {
-    "name": "Pokesition",
-    "icon": "static/marker_icons/pokesition.png"
+  "fist": {
+    "name": "Ököl",
+    "icon": "static/images/markers/fist.png"
   },
   "pokeball": {
     "name": "Pokeball",
-    "icon": "static/marker_icons/pokeball.gif"
+    "icon": "static/images/markers/pokeball.png"
+  },
+  "greatball": {
+    "name": "Great Ball",
+    "icon": "static/images/markers/greatball.png"
+  },
+  "masterball": {
+    "name": "Master Ball",
+    "icon": "static/images/markers/masterball.png"
+  },
+  "ultraball": {
+    "name": "Ultra Ball",
+    "icon": "static/images/markers/ultraball.png"
+  },
+  "potion": {
+    "name": "Potion",
+    "icon": "static/images/markers/potion.png"
+  },
+  "superpotion": {
+    "name": "Super Potion",
+    "icon": "static/images/markers/superpotion.png"
+  },
+  "hyperpotion": {
+    "name": "Hyper Potion",
+    "icon": "static/images/markers/hyperpotion.png"
+  },
+  "incense": {
+    "name": "Incense",
+    "icon": "static/images/markers/incense.png"
+  },
+  "raspberry": {
+    "name": "Raspberry",
+    "icon": "static/images/markers/raspberry.png"
+  },
+  "incubator": {
+    "name": "Incubator",
+    "icon": "static/images/markers/incubator.png"
+  },
+  "stardust": {
+    "name": "Stardust",
+    "icon": "static/images/markers/stardust.png"
+  },
+  "mobile": {
+    "name": "Mobil",
+    "icon": "static/images/markers/mobile.png"
+  },
+  "pokedex": {
+    "name": "Pokedex",
+    "icon": "static/images/markers/pokedex.png"
+  },
+  "pokesition": {
+    "name": "Pokesition",
+    "icon": "static/images/markers/pokesition.png"
   }
 }
