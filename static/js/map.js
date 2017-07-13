@@ -427,6 +427,7 @@ function pokemonLabel(item) {
     var rarityDisplay = item['pokemon_rarity'] ? '(' + item['pokemon_rarity'] + ')' : ''
     var types = item['pokemon_types']
     var typesDisplay = ''
+    var encounterId = item['encounter_id']
     var id = item['pokemon_id']
     var latitude = item['latitude']
     var longitude = item['longitude']
@@ -475,7 +476,7 @@ function pokemonLabel(item) {
                 <img class='pokemon sprite' src='static/icons/${id}.png'>
                 <span class='pokemon links exclude'><a href='javascript:excludePokemon(${id})'>Kiszűr</a></span>
                 <span class='pokemon links notify'><a href='javascript:notifyAboutPokemon(${id})'>Értesít</a></span>
-                <span class='pokemon links remove'><a href='javascript:notifyAboutPokemon(${id})'>Eltávolít</a></span>
+                <span class='pokemon links remove'><a href='javascript:removePokemonMarker("${encounterId}")'>Eltávolít</a></span>
                 <span class='pokemon links navilinks'><a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Google Maps Megnyitása'>Útvonal</a></span>
               </div>
           </div>
@@ -507,7 +508,7 @@ function pokemonLabel(item) {
             <img class='pokemon sprite' src='static/icons/${id}.png'>
             <span class='pokemon links exclude'><a href='javascript:excludePokemon(${id})'>Kiszűr</a></span>
             <span class='pokemon links notify'><a href='javascript:notifyAboutPokemon(${id})'>Értesít</a></span>
-            <span class='pokemon links remove'><a href='javascript:notifyAboutPokemon(${id})'>Eltávolít</a></span>
+            <span class='pokemon links remove'><a href='javascript:removePokemonMarker("${encounterId}")'>Eltávolít</a></span>
             <span class='pokemon links navilinks'><a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Google Maps Megnyitása'>Útvonal</a></span>
           </div>
       </div>
