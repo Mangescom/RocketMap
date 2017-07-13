@@ -2289,6 +2289,7 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
                         'cp_multiplier'] = pokemon_info.get(
                         'cp_multiplier', None)
 
+
             if args.webhooks:
                 if (pokemon_id in args.webhook_whitelist or
                     (not args.webhook_whitelist and pokemon_id
