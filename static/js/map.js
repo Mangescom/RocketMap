@@ -988,7 +988,7 @@ function setupGymMarker(item) {
             } else {
                 gymSidebar.setAttribute('data-id', item['gym_id'])
                 showGymDetails(item['gym_id']);
-				hook(hookToGymDetails);
+				//hook(hookToGymDetails);
             }
         })
 

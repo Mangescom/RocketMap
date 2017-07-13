@@ -871,7 +871,7 @@ var StoreOptions = {
         type: StoreTypes.Boolean
     },
     'useGymSidebar': {
-        default: false,
+        default: true,
         type: StoreTypes.Boolean
     },
     'showOpenGymsOnly': {
