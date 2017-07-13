@@ -417,7 +417,7 @@ function openMapDirections(lat, lng) { // eslint-disable-line no-unused-vars
 function getDateStr(t) {
     var dateStr = 'Unknown'
     if (t) {
-        dateStr = moment(t).startOf('hour').fromNow()
+        dateStr = moment(t).locale('hu').startOf('hour').fromNow()
     }
     return dateStr
 }
@@ -1772,8 +1772,8 @@ var updateLabelDiffTime = function () {
                 timestring = hours + 'hour '
             }
 
-            timestring += lpad(minutes, 2, 0) + 'min '
-            timestring += lpad(seconds, 2, 0) + 'sec '
+            timestring += lpad(minutes, 2, 0) + 'perc '
+            timestring += lpad(seconds, 2, 0) + 'mp '
             timestring += ''
         }
 
