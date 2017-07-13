@@ -112,7 +112,7 @@
 		};  
 		
 		var lock = new Auth0Lock('7IGpKBmL9sMljdFRUx2TNsNveNMFzbyX', 'pokemonbudapestvip.auth0.com',options);
-		// localStorage.removeItem('id_token');
+		// localStorage.removeItem('a_good_joke');
 		
 		  // buttons
 		  var btn_login = document.getElementById('btn-login');
@@ -141,12 +141,12 @@
 		  });
 		  lock.on('authorization_error', function(error) {
 				console.log('remove token')
-				localStorage.removeItem('id_token');
+				localStorage.removeItem('a_good_joke');
 			});
 
 
 		  var retrieve_profile = function() {
-			var id_token = localStorage.getItem('id_token');
+			var id_token = localStorage.getItem('a_good_joke');
 			console.log('retrieve profile')
 			if (id_token) {
 				console.log('van token')
@@ -200,7 +200,7 @@
 				}
 			if (profile.roles.indexOf('paid') != -1) {
 				console.log('save token')
-				localStorage.setItem('id_token', authResult.idToken);
+				localStorage.setItem('a_good_joke', authResult.idToken);
 				if (profile.roles.indexOf('trial') != -1) {
 					document.getElementById('info-msg').innerHTML = 'Próbaidőszak lejárta'
 					document.getElementById('info-msg2').innerHTML = year + '.' + month + '.' + day + ' ' + hours.substr(hours.length-2) + ':' + minutes.substr(minutes.length-2)
@@ -222,7 +222,7 @@
 
 		  var logout = function() {
 			console.log('remove token')
-			localStorage.removeItem('id_token');
+			localStorage.removeItem('a_good_joke');
 			btn_login.style.display = "inline";
 			btn_logout.style.display = "none";
 			document.getElementById('info-msg').innerHTML = '';

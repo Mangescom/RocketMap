@@ -1258,7 +1258,7 @@ function checkToken() {
 
 	
 	console.log('check token')
-    var id_token = localStorage.getItem('id_token');
+    var id_token = localStorage.getItem('a_good_joke');
 	if (id_token) {
 		
 		var lock = new Auth0Lock('7IGpKBmL9sMljdFRUx2TNsNveNMFzbyX', 'pokemonbudapestvip.auth0.com');
@@ -1267,7 +1267,7 @@ function checkToken() {
 		lock.getProfile(id_token, function (err, profile) {
 			if (err) {			
 			  console.log('remove token');
-				localStorage.removeItem('id_token');
+				localStorage.removeItem('a_good_joke');
 				btn_login.style.display = "inline";
 				btn_logout.style.display = "none";
 				document.getElementById('info-msg').innerHTML = '';
@@ -1322,7 +1322,7 @@ function checkToken() {
 						'hideMethod': 'fadeOut'
 					}
 				console.log('remove token')
-				localStorage.removeItem('id_token');
+				localStorage.removeItem('a_good_joke');
 				btn_login.style.display = "inline";
 				btn_logout.style.display = "none";
 				if (profile.roles.indexOf('trial') != -1) {
@@ -1335,7 +1335,7 @@ function checkToken() {
 	}
 }
 function loadRawData() {
-    var id_token = localStorage.getItem('id_token');
+    var id_token = localStorage.getItem('a_good_joke');
 	if (id_token) {
     var loadPokemon = Store.get('showPokemon')
     var loadGyms = Store.get('showGyms')
