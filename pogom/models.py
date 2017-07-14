@@ -1930,13 +1930,14 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
             now_date = datetime.utcfromtimestamp(
                 cell.current_timestamp_ms / 1000)
 
-        nearby_pokemon += len(cell.nearby_pokemons)
+        nearby_pokemon_count += len(cell.nearby_pokemons)
         # Parse everything for stats (counts).  Future enhancement -- we don't
         # necessarily need to know *how many* forts/wild/nearby were found but
         # we'd like to know whether or not *any* were found to help determine
         # if a scan was actually bad.
         if config['parse_pokemon']:
             wild_pokemon += cell.wild_pokemons
+            nearby_pokemon += cell.nearby_pokemons
 
         if config['parse_pokestops'] or config['parse_gyms']:
             forts += cell.forts
@@ -1970,10 +1971,9 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
 
         # Create list of present pokemon IDs for blinded check
         for p in nearby_pokemon:
-            nearby_pokemon_ids.append(p.get('pokemon_id', 0))
+            nearby_pokemon_ids.append(p.pokemon_id)
         for p in wild_pokemon:
-            nearby_pokemon_ids.append(p.get('pokemon_data', {})
-                                      .get('pokemon_id', 0))
+            nearby_pokemon_ids.append(p.pokemon_data.pokemon_id)
 
         # Remove common pokemons from seen
         rare_finds = [p for p in nearby_pokemon_ids if p not in common_ids]
@@ -2012,7 +2012,7 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
         # Store all encounter_ids and spawnpoint_ids for the Pokemon in query.
         # All of that is needed to make sure it's unique.
         encountered_pokemon = [
-            (p['encounter_id'], p['spawnpoint_id']) for p in query]
+            (p.encounter_id, p.spawnpoint_id) for p in query]
 
         for p in wild_pokemon:
 
