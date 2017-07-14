@@ -758,7 +758,7 @@ function formatSpawnTime(seconds) {
 function spawnpointLabel(item) {
     var str = `
         <div>
-            <b>Megejelnési Pont</b>
+            <b>Megjelenési Pont</b>
         </div>`
 
     if (item.uncertain) {

@@ -959,7 +959,7 @@ var StoreOptions = {
         type: StoreTypes.String
     },
     'iconSizeModifier': {
-        default: 20,
+        default: 10,
         type: StoreTypes.Number
     },
     'searchMarkerStyle': {
