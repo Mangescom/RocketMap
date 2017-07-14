@@ -1302,7 +1302,7 @@ class SpawnPoint(BaseModel):
             spawnpoints[key] = sp
             spawnpoints[key]['disappear_time'] = disappear_time
             spawnpoints[key]['appear_time'] = appear_time
-            if not SpawnPoint.tth_found(sp) or not sp['done']:
+            if not SpawnPoint.tth_found(sp):
                 spawnpoints[key]['uncertain'] = True
 
         # Helping out the GC.

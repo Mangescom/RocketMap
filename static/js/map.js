@@ -764,7 +764,7 @@ function spawnpointLabel(item) {
     if (item.uncertain) {
         str += `
             <div>
-                A megjelenési idő még nincs pontosan meghatározva. Jelenlegi tipp: ${formatSpawnTime(item.appear_time)}-tól ${formatSpawnTime(item.disappear_time)}-ig
+                A megjelenési idő nincs pontosan meghatározva. Legjobb becslés: ${formatSpawnTime(item.appear_time)}-tól ${formatSpawnTime(item.disappear_time)}-ig
             </div>`
     } else {
         str += `
