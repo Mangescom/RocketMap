@@ -417,7 +417,8 @@ function openMapDirections(lat, lng) { // eslint-disable-line no-unused-vars
 function getDateStr(t) {
     var dateStr = 'Unknown'
     if (t) {
-        dateStr = moment(t).locale('hu').startOf('hour').fromNow()
+        //dateStr = moment(t).locale('hu').startOf('hour').fromNow()
+        dateStr = moment(t).fromNow()
     }
     return dateStr
 }
@@ -2634,6 +2635,7 @@ $(function () {
 })
 
 $(function () {
+    moment.locale(language)
     function formatState(state) {
         if (!state.id) {
             return state.text
