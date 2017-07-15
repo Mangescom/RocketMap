@@ -458,11 +458,6 @@ function pokemonLabel(item) {
         formString += `(${unownForm[item['form']]})`
     }
 
-    contentstring += `
-    <div class='pokemon name'>
-      ${name} ${formString} ${genderType[gender - 1]} <span class='pokemon name pokedex'><a href='http://pokemon.gameinfo.io/en/pokemon/${id}' target='_blank' title='Pokédex'>#${id}</a></span> <span class='pokemon gender rarity'>${rarityDisplay}</span> ${typesDisplay}
-    </div>`
-
     if (cp !== null && cpMultiplier !== null) {
         var pokemonLevel = getPokemonLevel(cpMultiplier)
 
@@ -483,6 +478,9 @@ function pokemonLabel(item) {
           </div>
           <div class='pokemon container content-right'>
             <div>
+			  <div class='pokemon name'>
+					${name} ${formString} ${genderType[gender - 1]} <span class='pokemon name pokedex'><a href='http://pokemon.gameinfo.io/en/pokemon/${id}' target='_blank' title='Pokédex'>#${id}</a></span> ${typesDisplay}
+			  </div>
               <div class='pokemon disappear'>
                 <span class='label-countdown' disappears-at='${disappearTime}'>00m00s</span>
               </div>
@@ -514,7 +512,10 @@ function pokemonLabel(item) {
           </div>
       </div>
       <div class='pokemon container content-right'>
-        <div>
+        <div>			  
+		   <div class='pokemon name'>
+					${name} ${formString} ${genderType[gender - 1]} <span class='pokemon name pokedex'><a href='http://pokemon.gameinfo.io/en/pokemon/${id}' target='_blank' title='Pokédex'>#${id}</a></span> ${typesDisplay}
+		  </div>
           <div class='pokemon disappear'>
             <span class='label-countdown' disappears-at='${disappearTime}'>00m00s</span>
           </div>
