@@ -470,10 +470,10 @@ function pokemonLabel(item) {
             <div class='pokemon container content-left'>
               <div>
                 <img class='pokemon sprite' src='static/icons/${id}.png'>
-                <span class='pokemon links exclude'><a href='javascript:excludePokemon(${id})'>Kiszűr</a></span>
-                <span class='pokemon links notify'><a href='javascript:notifyAboutPokemon(${id})'>Értesít</a></span>
-                <span class='pokemon links remove'><a href='javascript:removePokemonMarker("${encounterId}")'>Eltávolít</a></span>
-                <span class='pokemon links navilinks'><a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Google Maps Megnyitása'>Útvonal</a></span>
+                <div class='pokemon links exclude'><a href='javascript:excludePokemon(${id})'>Kiszűr</a></div>
+                <div class='pokemon links notify'><a href='javascript:notifyAboutPokemon(${id})'>Értesít</a></div>
+                <div class='pokemon links remove'><a href='javascript:removePokemonMarker("${encounterId}")'>Eltávolít</a></div>
+                <div class='pokemon links navilinks'><a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Google Maps Megnyitása'>Útvonal</a></div>
               </div>
           </div>
           <div class='pokemon container content-right'>
@@ -494,7 +494,7 @@ function pokemonLabel(item) {
                 Súly: ${weight.toFixed(2)}kg | Magasság: ${height.toFixed(2)}m
               </div>
               <div>
-                Koordináta: ${latitude.toFixed(6)},${longitude.toFixed(7)}
+                Koordináta: <span class='pokemon no-encounter'>${latitude.toFixed(6)},${longitude.toFixed(7)}</span>
               </div>
           </div>
         </div>
@@ -505,10 +505,10 @@ function pokemonLabel(item) {
         <div class='pokemon container content-left'>
           <div>
             <img class='pokemon sprite' src='static/icons/${id}.png'>
-            <span class='pokemon links exclude'><a href='javascript:excludePokemon(${id})'>Kiszűr</a></span>
-            <span class='pokemon links notify'><a href='javascript:notifyAboutPokemon(${id})'>Értesít</a></span>
-            <span class='pokemon links remove'><a href='javascript:removePokemonMarker("${encounterId}")'>Eltávolít</a></span>
-            <span class='pokemon links navilinks'><a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Google Maps Megnyitása'>Útvonal</a></span>
+            <div class='pokemon links exclude'><a href='javascript:excludePokemon(${id})'>Kiszűr</a></div>
+            <div class='pokemon links notify'><a href='javascript:notifyAboutPokemon(${id})'>Értesít</a></div>
+            <div class='pokemon links remove'><a href='javascript:removePokemonMarker("${encounterId}")'>Eltávolít</a></div>
+            <div class='pokemon links navilinks'><a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Google Maps Megnyitása'>Útvonal</a></div>
           </div>
       </div>
       <div class='pokemon container content-right'>
@@ -520,10 +520,10 @@ function pokemonLabel(item) {
             <span class='label-countdown' disappears-at='${disappearTime}'>00m00s</span>
           </div>
           <div class='pokemon'>
-                IV: <span class='pokemon no-encounter'>N/A</span> | CP: <span class='pokemon no-encounter'>N/A</span> | Szint: <span class='pokemon no-encounter'>N/A</span>
+                IV: <span class='pokemon no-encounter'>n/a</span> | CP: <span class='pokemon no-encounter'>n/a</span> | Szint: <span class='pokemon no-encounter'>n/a</span>
           </div>
           <div class='pokemon'>
-            Támadások: <span class='pokemon no-encounter'>N/A</span>
+            Támadások: <span class='pokemon no-encounter'>n/a</span>
           </div>
           <div class='pokemon'>
             Súly: <span class='pokemon no-encounter'>n/a</span> | Magasság: <span class='pokemon no-encounter'>n/a</span>
@@ -560,25 +560,29 @@ function gymLabel(gym, includeMembers = true) {
             let pMove2 = (moves[raid['move_2']] !== undefined) ? i8ln(moves[raid['move_2']]['name']) : 'gen/unknown'
 
             raidStr += `
-                    <div class='raid encounter'>
+				<div class='raid encounter'>
+                    <div>
                        CP: <span class='raid encounter info'>${raid['cp']}</span>
                     </div>
-                    <div class='raid encounter'>
-                         Támadások: <span class='raid encounter info'>${pMove1}/${pMove2}</span>
-                    </div>`
+                    <div>
+                         <span class='raid encounter'>${pMove1}</span>
+                    </div>
+                    <div>
+                         <span class='raid encounter'>${pMove2}</span>
+                    </div>
+				</div>
+					`
         }
     }
     const lastScannedStr = getDateStr(gym.last_scanned)
     const lastModifiedStr = getDateStr(gym.last_modified)
-    const slotsString = gym.slots_available ? (gym.slots_available === 1 ? '1 Szabad Hely' : `${gym.slots_available} Szabad Hely`) : 'Nincs Szabad Hely'
+    const slotsString = gym.slots_available ? (gym.slots_available === 1 ? '1' : `${gym.slots_available}`) : 'nincs'
     const teamColor = ['85,85,85,1', '0,134,255,1', '255,26,26,1', '255,159,25,1']
     const teamName = gymTypes[gym.team_id]
     const isUpcomingRaid = raid != null && Date.now() < raid.start
     const isRaidStarted = isOngoingRaid(raid)
 
-    var subtitle = ''
     var image = ''
-    var imageLbl = ''
     var navInfo = ''
     var memberStr = ''
 
@@ -589,45 +593,29 @@ function gymLabel(gym, includeMembers = true) {
         ${titleText}
       </div>`
 
-    if (gym.team_id !== 0) {
-        subtitle = `
-        <div>
-            <img class='gym info strength' src='static/images/gym/Strength.png'>
-            <span class='gym info strength'>
-              Erősség: ${gymPoints} (${slotsString})
-            </span>
-        </div>`
-    }
-
+	image = `<div class='gym container'>
+				<div class='gym container content-left'>
+				<div>`
+				
+	navInfo = `<div class='gym container content-right'>
+				<div>`
+	
     if (isUpcomingRaid || isRaidStarted) {
         const raidColor = ['252,112,176', '255,158,22']
         const levelStr = '★'.repeat(raid['level'])
 
-        if (isRaidStarted && raid.pokemon_id) {
-            // Set default image.
-            image = `
-                <img class='gym sprite' src='static/images/raid/unknown.png'>
-                ${raidStr}
-            `
-
-            // Use Pokémon-specific image if we have one.
-            if (pokemonWithImages.indexOf(raid.pokemon_id) !== -1) {
-                image = `
-                    <img class='gym sprite' src='static/images/raid/${raid.pokemon_id}.png'>
-                    ${raidStr}
-                `
-            }
-        } else {
-            image = `<img class='gym sprite' src='static/images/raid/${gymTypes[gym.team_id]}_${getGymLevel(gym)}_${raid.level}.png'>`
-        }
-
         if (isUpcomingRaid) {
-            imageLbl = `
-                <div class='raid'>
-                  <span style='color:rgb(${raidColor[Math.floor((raid.level - 1) / 2)]})'>
-                  ${levelStr}
-                  </span>
-                  Raid in <span class='raid countdown label-countdown' disappears-at='${raid.start}'></span>
+		   image += `
+                <div class='raid mid'>
+					<div>
+						Raid
+					</div>
+                  <div style='color:rgb(${raidColor[Math.floor((raid.level - 1) / 2)]})'>${levelStr}</div>
+				 </div>`
+				 
+            navInfo += `
+                <div class='raid cd'>
+                  <span class='raid countdown label-countdown' disappears-at='${raid.start}'></span> múlva
                 </div>`
         } else {
             let typesDisplay = ''
@@ -635,44 +623,91 @@ function gymLabel(gym, includeMembers = true) {
             $.each(raid.pokemon_types, function (index, type) {
                 typesDisplay += getTypeSpan(type)
             })
-
-            subtitle = `
-                <div class='raid'>
-                  <span style='color:rgb(${raidColor[Math.floor((raid.level - 1) / 2)]})'>
-                  ${levelStr}
-                  </span>
+			
+			image += `
+                <div class='raid mid'>
+					<div>
+						Raid
+					</div>
+                  <div style='color:rgb(${raidColor[Math.floor((raid.level - 1) / 2)]})'>${levelStr}</div>
+				 </div>`
+				 
+			// ezt én írtam bele hogy ne írjon ki null-t
+            if (raid.pokemon_id != null) {
+				navInfo += `<div class='raid pokemon name'>
+							${raid['pokemon_name']}
+								<a href='http://pokemon.gameinfo.io/en/pokemon/${raid['pokemon_id']}' target='_blank' title='Pokédex'>#${raid['pokemon_id']}</a>
+							${typesDisplay}
+						</div>`
+			}
+				 
+            navInfo += `
+                <div class='raid cd'>
                   <span class='raid countdown label-countdown' disappears-at='${raid.end}'></span>
-                </div>
-                   <div class='raid pokemon name'>
-                        ${raid['pokemon_name']}
-                            <a href='http://pokemon.gameinfo.io/en/pokemon/${raid['pokemon_id']}' target='_blank' title='Pokédex'>#${raid['pokemon_id']}</a>
-                        ${typesDisplay}
                 </div>`
+				
+        }
+		
+		if (isRaidStarted && raid.pokemon_id) {
+
+            // Use Pokémon-specific image if we have one.
+            if (pokemonWithImages.indexOf(raid.pokemon_id) !== -1) {
+                image += `
+                    <img class='gym sprite' src='static/images/raid/${raid.pokemon_id}.png'>
+                    ${raidStr}
+                `
+            } else {
+				// Set default image.
+				image += `
+					<img class='gym sprite' src='static/images/raid/unknown.png'>
+					${raidStr}
+            `
+			}
+        } else {
+            image += `<img class='gym sprite' src='static/images/raid/${gymTypes[gym.team_id]}_${getGymLevel(gym)}_${raid.level}.png'>`
         }
     } else {
-        image = `<img class='gym sprite' src='static/images/gym/${teamName}_${getGymLevel(gym)}.png'>`
+        image += `<img class='gym sprite' src='static/images/gym/${teamName}_${getGymLevel(gym)}.png'>`
     }
-
-
-    navInfo = `
-            <div class='gym container'>
-                <div>
-                  <span class='gym info navigate'>
-                    <a href='javascript:void(0);' onclick='javascript:openMapDirections(${gym.latitude},${gym.longitude});' title='Útvonalterv'>
-                      ${gym.latitude.toFixed(6)}, ${gym.longitude.toFixed(7)}
+	
+	// image lezárás
+	image += `<div class='gym info navilinks'>
+                    <a href='javascript:void(0);' onclick='javascript:openMapDirections(${gym.latitude},${gym.longitude});' title='Google Maps'>
+                      Útvonal
                     </a>
-                  </span>
-                </div>
+                  </div>
+			</div></div>`
+
+    navInfo += `<div class='gym'>`
+	
+    if (gym.team_id !== 0) {
+        navInfo += `
+				<div  class='gym info'>
+					Erősség: <img class='gym info strength' src='static/images/gym/Strength.png'><span class='gym enc'> ${gymPoints}</span>
+				</div>
+				<div  class='gym info last-scanned'>
+					Szabad hely: <span class='gym enc'>${slotsString}</span>
+				</div>`
+	}
+	
+	navInfo += `
                 <div class='gym info last-scanned'>
-                    Legutóbb Szkennelve: ${lastScannedStr}
+                    Szkennelve: <span class='gym no-enc'>${lastScannedStr}</span>
                 </div>
                 <div class='gym info last-modified'>
-                    Legutóbb Módosítva: ${lastModifiedStr}
+                    Módosítva: <span class='gym no-enc'>${lastModifiedStr}</span>
+                </div>
+                <div class='gym info navigate'>
+                    Koordináta: <span class='gym no-enc'>${gym.latitude.toFixed(6)},${gym.longitude.toFixed(7)}</span>
                 </div>
             </div>
-        </div>`
+        </div>
+		</div>
+		</div>`
 
-
+	// navInfo lezárás
+	navInfo += `</div>`
+			
     if (!isRaidStarted && includeMembers) {
         memberStr = '<div>'
 
@@ -702,10 +737,8 @@ function gymLabel(gym, includeMembers = true) {
         <div>
             <center>
                 ${title}
-                ${subtitle}
-                ${image}
-                ${imageLbl}
             </center>
+            ${image}
             ${navInfo}
             <center>
                 ${memberStr}
@@ -1768,11 +1801,11 @@ var updateLabelDiffTime = function () {
         var timestring = ''
 
         if (disappearsAt.ttime < disappearsAt.now) {
-            timestring = '(expired)'
+            timestring = '(lejárt)'
         } else {
             timestring = ''
             if (hours > 0) {
-                timestring = hours + 'hour '
+                timestring = hours + 'óra '
             }
 
             timestring += lpad(minutes, 2, 0) + 'perc '

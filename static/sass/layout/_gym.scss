@@ -1,11 +1,26 @@
+.gym.container {
+  display: flex;
+
+  &.content-left {
+    width:70px;
+  }
+
+  &.content-right {
+    float: left;
+  }
+}
+
 .gym {
   color: rgb(93,109,126);
   font-size: 11px;
   font-weight: 500;
+  
+  &.enc {
+    font-weight: 900;
+  }
 
-  &.container {
-    display: grid;
-    justify-content: center;
+  &.no-enc {
+    font-weight: 300;
   }
 
   &.member {
@@ -16,7 +31,7 @@
   &.name {
     font-size: 14px;
     font-weight: 900;
-    margin-bottom: 2px;
+    margin-bottom: 7px;
     text-decoration: underline;
   }
 
@@ -24,35 +39,24 @@
     display: block;
     height: 48px;
     width: 48px;
-    margin: 10px 0px 10px 0px;
+    margin-bottom: 10px;
+    margin-left: 3px;
   }
 
   &.info {
-
-    &.last-modified:before {
-      content: '\f040';
-      display: inline-block;
-      font-family: FontAwesome;
-      height: 16px;
-      width: 16px;
-      -webkit-font-smoothing: antialiased;
+  
+    margin-bottom: 3px;
+	
+	&.navilinks {
+      margin-top: 3px;    
+	  justify-content: center;
+      text-align: center;
     }
-
-    &.last-scanned:before {
-      content: '\f002';
-      display: inline-block;
-      font-family: FontAwesome;
-      height: 16px;
-      width: 16px;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    &.navigate:before {
+	
+	&.navilinks:before {
       content: '\f018';
-      display: inline-block;
       font-family: FontAwesome;
-      height: 16px;
-      width: 16px;
+      margin-right: 3px;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -84,9 +88,21 @@
   font-size: 11px;
   font-weight: 900;
   margin-bottom: 5px;
-
+  
+  &.mid {
+    justify-content: center;
+    text-align: center;
+    margin: 0px 0px 5px 0px;
+  }  
+  
+  &.cd {
+    margin: 10px 0px 10px 0px;
+  }
+  
   &.countdown {
-
+    font-size: 14px;
+    font-weight: 900;
+  
     &:before {
       content: '\f017';
       display: inline-block;
@@ -100,9 +116,14 @@
 
   &.encounter {
     font-weight: 500;
+	margin-bottom: 0px;
+	margin-right: 1px;    
+	justify-content: center;
+    text-align: center;
 
     &.info {
       font-weight: 900;
+	  margin-top: 3px;
     }
 
     &.pokemon.name {
