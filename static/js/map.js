@@ -752,7 +752,7 @@ function pokestopLabel(expireTime, latitude, longitude) {
         str = `
             <div>
               <div class='pokestop lure'>
-                Lured Pokéstop
+                Lure-ozott Pokéstop
               </div>
               <div class='pokestop-expire'>
                   <span class='label-countdown' disappears-at='${expireTime}'>00m00s</span>
@@ -761,7 +761,7 @@ function pokestopLabel(expireTime, latitude, longitude) {
                 <img class='pokestop sprite' src='static/images/pokestop//PokestopLured.png'>
               </div>
               <div>
-                <span class='pokestop navigate'><a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Útvonalterv'; class='pokestop lure'>${latitude.toFixed(6)}, ${longitude.toFixed(7)}</a></span>
+                <span class='pokestop navigate'><a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Google Maps'; class='pokestop lure'>Útvonal</a></span>
               </div>
             </div>
           </div>`
@@ -775,7 +775,7 @@ function pokestopLabel(expireTime, latitude, longitude) {
                 <img class='pokestop sprite' src='static/images/pokestop//Pokestop.png'>
               </div>
               <div>
-                <span class='pokestop navigate'><a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Útvonalterv'; class='pokestop nolure'>${latitude.toFixed(6)}, ${longitude.toFixed(7)}</a></span>
+                <span class='pokestop navigate'><a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Google Maps'; class='pokestop nolure'>Útvonal</a></span>
               </div>
             </div>
           </div>`
