@@ -1910,14 +1910,12 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
     sightings = {}
     new_spawn_points = []
     sp_id_list = []
-<<<<<<< HEAD
     captcha_url = ''
     missed = []
     common_ids = [16, 19, 23, 27, 29, 32, 41, 43, 46, 52, 54, 60, 69,
                   72, 74, 81, 98, 118, 120, 129, 161, 165, 167, 177,
                   183, 187, 191, 194, 198, 209, 218]
-=======
->>>>>>> b7764f12c991eca7f55308a6297ef6773e094f0d
+
 
     # Consolidate the individual lists in each cell into two lists of Pokemon
     # and a list of forts.
@@ -2139,16 +2137,6 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
                     'cp_multiplier': pokemon_info.cp_multiplier
                 })
 
-<<<<<<< HEAD
-                # Only add CP if we're level 30+.
-                if encounter_level >= 30:
-                    pokemon[p.encounter_id]['cp'] = cp
-                    pokemon[p.encounter_id][
-                        'cp_multiplier'] = pokemon_info.cp_multiplier
-
-
-=======
->>>>>>> b7764f12c991eca7f55308a6297ef6773e094f0d
             if args.webhooks:
                 if (pokemon_id in args.webhook_whitelist or
                     (not args.webhook_whitelist and pokemon_id
@@ -2185,11 +2173,7 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
                      datetime(1970, 1, 1)).total_seconds())) for f in query]
 
         # Complete tutorial with a Pokestop spin
-<<<<<<< HEAD
         if (args.complete_tutorial and not args.pokestop_spinning):
-=======
-        if args.complete_tutorial:
->>>>>>> b7764f12c991eca7f55308a6297ef6773e094f0d
             if config['parse_pokestops']:
                 tutorial_pokestop_spin(
                     api, level, forts, step_location, account)
