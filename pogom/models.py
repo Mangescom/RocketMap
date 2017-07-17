@@ -2182,7 +2182,6 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
                                       + ' Account will not be used.',
                                       hlvl_account['username'])
                         else:
-                            hlvl_account['captcha'] = True
                             # Update level indicator before we clear the
                             # response.
                             encounter_level = hlvl_account['level']
