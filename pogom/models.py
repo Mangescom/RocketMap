@@ -2538,6 +2538,7 @@ def encounter_pokemon(args, pokemon, account, api, account_sets, status,
 
                 if ('ENCOUNTER' in enc_responses and
                         enc_responses['ENCOUNTER'].status != 1):
+                    hlvl_account['captcha'] = True
                     log.error('There was an error encountering Pokemon ID %s with '
                               + 'account %s: %d', pokemon_id,
                               hlvl_account['username'],
