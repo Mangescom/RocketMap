@@ -564,7 +564,7 @@ function isGymSatisfiesRaidMinMaxFilter(raid) {
 function gymLabel(gym, includeMembers = true) {
     const pokemonWithImages = [
         3, 6, 9, 59, 65, 68, 89, 94, 103, 110, 112, 125, 126, 129, 131, 134,
-        135, 136, 143, 153, 156, 159, 248
+        135, 136, 143, 144, 145, 146, 153, 156, 159, 248, 249
     ]
 
     const raid = gym.raid
@@ -616,7 +616,7 @@ function gymLabel(gym, includeMembers = true) {
 				<div>`
 	
     if (isUpcomingRaid || isRaidStarted) {
-        const raidColor = ['252,112,176', '255,158,22']
+        const raidColor = ['252,112,176', '255,158,22', '184,165,221']
         const levelStr = '★'.repeat(raid['level'])
 
         if (isUpcomingRaid) {
@@ -1076,13 +1076,24 @@ function setupGymMarker(item) {
 }
 
 function updateGymMarker(item, marker) {
+     const pokemonWithImages = [
+         3, 6, 9, 59, 65, 68, 89, 94, 103, 110, 112, 125, 126, 129, 131, 134,
+          135, 136, 143, 144, 145, 146, 153, 156, 159, 248, 249
+      ]
     if (item.raid !== null && item.raid.end > Date.now() && item.raid.pokemon_id !== null) {
-        marker.setIcon({
-            url: 'static/images/raid/' + item['raid']['pokemon_id'] + '.png',
-            scaledSize: new google.maps.Size(48, 48)
-        })
+        if (pokemonWithImages.indexOf(item.raid.pokemon_id) !== -1) {
+            marker.setIcon({
+                url: 'static/images/raid/' + item['raid']['pokemon_id'] + '.png',
+                scaledSize: new google.maps.Size(48, 48)
+            })
+        } else {
+            marker.setIcon({
+                url: 'static/images/raid/' + gymTypes[item.team_id] + '_' + item.raid.level + '_unknown.png',
+                scaledSize: new google.maps.Size(48, 48)
+            })
+        }
         marker.setZIndex(google.maps.Marker.MAX_ZINDEX + 1)
-    } else if (item.raid !== null && item.raid.end > Date.now() && Store.get('showRaids')) {
+    } else if (item.raid !== null && item.raid.end > Date.now()) {
         marker.setIcon({
             url: 'static/images/gym/' + gymTypes[item.team_id] + '_' + getGymLevel(item) + '_' + item['raid']['level'] + '.png',
             scaledSize: new google.maps.Size(48, 48)
