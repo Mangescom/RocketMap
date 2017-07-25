@@ -2423,7 +2423,8 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
                 sp['earliest_unseen'] + 14 * 60) % 3600
             spawn_points[sp['id']] = sp
 
-    db_update_queue.put((ScannedLocation, {0: scan_loc}))
+    if not args.spawnpoint_scanning:
+        db_update_queue.put((ScannedLocation, {0: scan_loc}))
 
     if pokemon:
         db_update_queue.put((Pokemon, pokemon))
@@ -2435,7 +2436,8 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
         db_update_queue.put((Raid, raids))
     if spawn_points:
         db_update_queue.put((SpawnPoint, spawn_points))
-        db_update_queue.put((ScanSpawnPoint, scan_spawn_points))
+        if not args.spawnpoint_scanning:
+            db_update_queue.put((ScanSpawnPoint, scan_spawn_points))
         if sightings:
             db_update_queue.put((SpawnpointDetectionData, sightings))
 
