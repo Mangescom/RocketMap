@@ -458,7 +458,6 @@
           -webkit-font-smoothing: antialiased;
         }
       }
-<<<<<<< HEAD
 	  
 	  &.mid {
 		line-height: normal;
@@ -469,15 +468,13 @@
         font-weight: 500;
 		line-height: normal;
 		margin-top: 10px;
-=======
 
-      &.pokemon {
-        font-size: 16px;
-        font-weight: 900;
-        float: left;
-      }
->>>>>>> d9aadd06a443aedd1ab25feb204f5d65c9772ddf
 
+      &.pokemon.name {
+		font-size: 14px;
+		margin-bottom: 0px;
+       } 
+       
       .move {
         .name {
           @media screen and (max-width: 480px) {
@@ -519,11 +516,6 @@
               // color: _get_text_color(#705898);
           }
 
-<<<<<<< HEAD
-      &.pokemon.name {
-		font-size: 14px;
-		margin-bottom: 0px;
-=======
           &.normal {
               background-color: #8a8a59;
               // color: _get_text_color(#8a8a59);
@@ -602,7 +594,6 @@
               background-color: #705848;
           }
         }
->>>>>>> d9aadd06a443aedd1ab25feb204f5d65c9772ddf
       }
     }
   }
